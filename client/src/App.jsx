@@ -5,6 +5,7 @@ import {
   Trash2,
   Layers,
   Scissors,
+  Minimize2,
   ArrowLeft,
   Sparkles,
 } from 'lucide-react';
@@ -85,6 +86,7 @@ export default function App() {
         fileCounts={{
           merge: files.length,
           split: files.length,
+          compress: files.length,
         }}
       />
 
@@ -105,6 +107,7 @@ export default function App() {
                 fileCounts={{
                   merge: files.length,
                   split: files.length,
+                  compress: files.length,
                 }}
               />
             </motion.div>
@@ -302,6 +305,106 @@ export default function App() {
                         files={files}
                         onReset={handleClearAll}
                         activeToolId="split-pdf"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {activeTab === 'compress' && (
+            <motion.div
+              key="compress"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {/* Tool Header */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E8E1D5]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6E7C52] to-[#55603F] text-white flex items-center justify-center shadow-md shadow-[#8B9A6E]/20">
+                    <Minimize2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg sm:text-xl font-bold text-[#262D20]">
+                        PDF Compressor
+                      </h2>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8B9A6E]/15 text-[#4E593D] border border-[#8B9A6E]/30">
+                        Object Streams & Ghostscript
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6B785E]">
+                      Shrink PDF file size with stream compression, metadata stripping, and quality presets
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('home')}
+                  className="text-xs text-[#55603F] hover:text-[#262D20] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD3C4] hover:border-[#8B9A6E] shadow-sm transition-all font-semibold"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to Home</span>
+                </button>
+              </div>
+
+              {files.length === 0 ? (
+                <div className="max-w-xl mx-auto py-10">
+                  <div className="text-center mb-6">
+                    <p className="text-sm text-[#6B785E]">
+                      Upload a PDF document to compress and optimize its file size.
+                    </p>
+                  </div>
+                  <Uploader onFilesAdded={handleFilesAdded} />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* File Queue Toolbar */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#262D20]">
+                      <Files className="w-4 h-4 text-[#8B9A6E]" />
+                      <span>Target Document (Primary: #{1} {files[0].name})</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClearAll}
+                      className="text-xs text-[#717E64] hover:text-rose-600 flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded-lg hover:bg-rose-50 font-medium"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear all</span>
+                    </button>
+                  </div>
+
+                  {/* Responsive grid: Left side list, Right side operations */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div className="lg:col-span-7 space-y-3 order-2 lg:order-1">
+                      <AnimatePresence>
+                        {files.map((fileItem, idx) => (
+                          <FileCard
+                            key={fileItem.id}
+                            fileItem={fileItem}
+                            index={idx}
+                            totalFiles={files.length}
+                            onRemove={handleRemoveFile}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                          />
+                        ))}
+                      </AnimatePresence>
+
+                      <Uploader onFilesAdded={handleFilesAdded} compact={true} />
+                    </div>
+
+                    <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-24">
+                      <OperationBar
+                        files={files}
+                        onReset={handleClearAll}
+                        activeToolId="compress-pdf"
                       />
                     </div>
                   </div>

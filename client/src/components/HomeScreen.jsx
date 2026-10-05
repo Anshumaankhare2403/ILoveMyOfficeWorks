@@ -57,16 +57,17 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
     },
     {
       id: 'compress',
-      name: 'Compress & Convert',
-      status: 'Roadmap',
+      name: 'PDF Compressor',
+      status: 'Active',
       phase: 'Phase 5',
       icon: Minimize2,
       color: 'from-[#6E7C52] to-[#55603F]',
       description:
-        'Local Ghostscript compression and high-fidelity PDF to image conversion.',
-      features: ['Ghostscript engine', 'Local Node.js backend', 'qpdf unlock/protect'],
-      actionText: 'Phase 5 Preview',
-      disabled: true,
+        'Reduce document size using object stream packing, metadata stripping, and optional Ghostscript.',
+      features: ['In-browser optimization', 'Object stream packing', 'Local Ghostscript fallback'],
+      actionText: 'Open PDF Compressor',
+      disabled: false,
+      count: fileCounts.compress || 0,
     },
   ];
 

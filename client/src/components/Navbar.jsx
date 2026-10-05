@@ -4,6 +4,7 @@ import {
   Heart,
   Layers,
   Scissors,
+  Minimize2,
   Home,
   ShieldCheck,
 } from 'lucide-react';
@@ -24,6 +25,13 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
       icon: Scissors,
       count: fileCounts.split || 0,
       badge: 'Ranges',
+    },
+    {
+      id: 'compress',
+      label: 'Compress PDF',
+      icon: Minimize2,
+      count: fileCounts.compress || 0,
+      badge: 'Size',
     },
   ];
 

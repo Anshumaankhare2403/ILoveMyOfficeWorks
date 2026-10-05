@@ -22,6 +22,16 @@ A personal, private, client-first PDF toolkit web application built with **React
   - Download all split segments bundled into a single `.zip` archive via `JSZip`.
   - Download individual split parts directly from the results card.
 
+### 3. PDF Compressor (`compress-pdf.js`)
+- **Dual Engine Architecture**:
+  - **In-Browser Engine**: 100% client-side memory compression using binary object streams, orphan object stripping, and structural table optimization (Zero upload needed).
+  - **Local Ghostscript Engine**: Optional integration with local Ghostscript on `localhost:3001` with seamless fallback if backend is offline.
+- **Three Quality Presets**:
+  - *Recommended*: Balanced quality with stream packing.
+  - *Extreme*: Aggressive structural purging and metadata stripping.
+  - *Lossless*: Pure object stream grouping retaining all vector fidelity.
+- **Visual Reduction Metrics**: Shows live before & after file sizes and percentage saved (e.g., `-42% Size Reduction`).
+
 ### 3. Navigation & Home Dashboard
 - **Animated Splash Screen**: Boot sequence on startup with memory initialization progress, security check, and smooth fade-out.
 - **Dedicated Navigation Bar**: Separate desktop and mobile tab navigation with active pill transitions:

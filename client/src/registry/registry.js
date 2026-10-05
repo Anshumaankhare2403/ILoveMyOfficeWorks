@@ -1,5 +1,6 @@
 import mergePdfAdapter from './adapters/merge-pdf';
 import splitPdfAdapter from './adapters/split-pdf';
+import compressPdfAdapter from './adapters/compress-pdf';
 
 /**
  * Adapter Registry
@@ -9,6 +10,7 @@ import splitPdfAdapter from './adapters/split-pdf';
 export const ADAPTER_REGISTRY = [
   mergePdfAdapter,
   splitPdfAdapter,
+  compressPdfAdapter,
 ];
 
 /**

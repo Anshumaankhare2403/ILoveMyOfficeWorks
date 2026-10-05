@@ -19,11 +19,13 @@ import { formatFileSize } from '../utils/pdf-magic';
 export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf' }) {
   const [selectedAdapterId, setSelectedAdapterId] = useState(activeToolId);
   const [adapterOptions, setAdapterOptions] = useState({
-    outputFilename: 'merged-document.pdf',
+    outputFilename: '',
     splitMode: 'range',
     pageRanges: '1-2',
     everyN: 1,
     outputPrefix: 'split_document',
+    compressionLevel: 'recommended',
+    engine: 'browser',
   });
   const [isExecuting, setIsExecuting] = useState(false);
   const [progress, setProgress] = useState({ percent: 0, status: '' });
@@ -94,6 +96,17 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
     document.body.removeChild(a);
   };
 
+  const getAdapterIcon = (id) => {
+    switch (id) {
+      case 'split-pdf':
+        return <Scissors className="w-4 h-4" />;
+      case 'compress-pdf':
+        return <Minimize2 className="w-4 h-4" />;
+      default:
+        return <Layers className="w-4 h-4" />;
+    }
+  };
+
   return (
     <div className="w-full space-y-4">
       {/* Dynamic Adapter Selector & Action Panel */}
@@ -135,11 +148,7 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                       : 'bg-[#FAF8F4] text-[#55603F] hover:bg-white hover:text-[#262D20] border border-[#DDD3C4]'
                   }`}
                 >
-                  {adapter.id === 'split-pdf' ? (
-                    <Scissors className="w-4 h-4" />
-                  ) : (
-                    <Layers className="w-4 h-4" />
-                  )}
+                  {getAdapterIcon(adapter.id)}
                   <span>{adapter.name}</span>
                   {adapter.badge && (
                     <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-black/15 text-white/90">
@@ -208,7 +217,15 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                             min={opt.min}
                             max={opt.max}
                             value={adapterOptions[opt.id] ?? opt.default}
-                            placeholder={opt.placeholder || ''}
+                            placeholder={
+                              opt.id === 'outputFilename'
+                                ? activeAdapter?.id === 'compress-pdf'
+                                  ? `${files[0]?.name?.replace(/\.pdf$/i, '') || 'document'}_compressed.pdf`
+                                  : activeAdapter?.id === 'split-pdf'
+                                  ? 'split_part'
+                                  : 'merged-document.pdf'
+                                : opt.placeholder || ''
+                            }
                             onChange={(e) => handleOptionChange(opt.id, e.target.value)}
                             disabled={isExecuting}
                             className="w-full bg-white border border-[#CBD5BD] rounded-lg px-3 py-2 text-sm text-[#262D20] placeholder-[#9EAC8E] focus:outline-none focus:border-[#8B9A6E] focus:ring-1 focus:ring-[#8B9A6E] transition-all"
@@ -268,6 +285,8 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                     <span>
                       {activeAdapter.id === 'split-pdf'
                         ? `Split PDF (${files[0]?.name || 'Document'})`
+                        : activeAdapter.id === 'compress-pdf'
+                        ? `Compress PDF (${files[0]?.name || 'Document'})`
                         : `Merge ${files.length} PDFs Sequentially`}
                     </span>
                   </>
@@ -303,6 +322,11 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                   <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#8B9A6E]/20 text-[#434D31] border border-[#8B9A6E]/30">
                     Ready
                   </span>
+                  {executionResult.engineUsed && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-white border border-[#CBD5BD] text-[#55603F]">
+                      {executionResult.engineUsed}
+                    </span>
+                  )}
                 </div>
                 <p
                   className="text-xs sm:text-sm text-[#3E4733] font-mono mt-1 truncate font-semibold"
@@ -330,6 +354,22 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                     </>
                   )}
                 </div>
+
+                {/* Compression metrics banner if present */}
+                {executionResult.savingsPercent !== undefined && executionResult.originalSize && (
+                  <div className="mt-3 p-3 bg-white/90 rounded-xl border border-[#CBD5BD] flex flex-wrap items-center justify-between gap-2 text-xs shadow-sm">
+                    <div className="flex items-center gap-2 flex-wrap text-[#4E593D]">
+                      <span>Original: <strong>{formatFileSize(executionResult.originalSize)}</strong></span>
+                      <span className="text-[#8B9A6E]">→</span>
+                      <span>Compressed: <strong className="text-[#262D20]">{formatFileSize(executionResult.compressedSize)}</strong></span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-[#8B9A6E]/20 text-[#3C472E] font-bold text-[11px]">
+                      {executionResult.savingsPercent > 0
+                        ? `-${executionResult.savingsPercent}% Size Reduction`
+                        : 'Structure Optimized'}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
