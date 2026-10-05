@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import {
   Layers,
   Scissors,
+  Minimize2,
   Download,
   AlertCircle,
   CheckCircle2,
