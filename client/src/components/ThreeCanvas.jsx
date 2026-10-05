@@ -18,38 +18,38 @@ export default function ThreeCanvas() {
     );
     camera.position.z = 7;
 
-    // WebGL Renderer
+    // WebGL Renderer with alpha transparency
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Geometry 1: Ambient floating crystalline icosahedron wireframe
+    // Geometry 1: Ambient crystalline icosahedron in sage green
     const geometry = new THREE.IcosahedronGeometry(2.4, 2);
     const material = new THREE.MeshStandardMaterial({
-      color: 0x6366f1,
-      roughness: 0.2,
-      metalness: 0.8,
+      color: 0x8b9a6e, // User palette sage
+      roughness: 0.3,
+      metalness: 0.4,
       wireframe: true,
       transparent: true,
-      opacity: 0.25,
+      opacity: 0.35,
     });
     const crystalMesh = new THREE.Mesh(geometry, material);
     scene.add(crystalMesh);
 
-    // Inner glowing sphere
+    // Inner geometric core in warm cream/champagne
     const innerGeo = new THREE.IcosahedronGeometry(1.6, 1);
     const innerMat = new THREE.MeshStandardMaterial({
-      color: 0x8b5cf6,
+      color: 0xebd8c3,
       wireframe: true,
       transparent: true,
-      opacity: 0.15,
+      opacity: 0.25,
     });
     const innerMesh = new THREE.Mesh(innerGeo, innerMat);
     scene.add(innerMesh);
 
-    // Geometry 2: Floating particle cloud
-    const particlesCount = 180;
+    // Geometry 2: Floating subtle pollen/particles
+    const particlesCount = 140;
     const posArray = new Float32Array(particlesCount * 3);
     for (let i = 0; i < particlesCount * 3; i++) {
       posArray[i] = (Math.random() - 0.5) * 14;
@@ -57,25 +57,24 @@ export default function ThreeCanvas() {
     const particlesGeo = new THREE.BufferGeometry();
     particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     const particlesMat = new THREE.PointsMaterial({
-      size: 0.035,
-      color: 0x38bdf8,
+      size: 0.04,
+      color: 0x8b9a6e,
       transparent: true,
-      opacity: 0.5,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.4,
     });
     const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
     scene.add(particlesMesh);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    // Warm natural lighting
+    const ambientLight = new THREE.AmbientLight(0xfefcf8, 1.2);
     scene.add(ambientLight);
 
-    const pointLight1 = new THREE.PointLight(0x6366f1, 2, 50);
-    pointLight1.position.set(5, 5, 5);
+    const pointLight1 = new THREE.PointLight(0x8b9a6e, 2, 40);
+    pointLight1.position.set(4, 5, 4);
     scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0x06b6d4, 2, 50);
-    pointLight2.position.set(-5, -5, 2);
+    const pointLight2 = new THREE.PointLight(0xebe4d8, 1.8, 40);
+    pointLight2.position.set(-4, -4, 2);
     scene.add(pointLight2);
 
     // Mouse parallax
@@ -87,8 +86,8 @@ export default function ThreeCanvas() {
     const onMouseMove = (e) => {
       const windowHalfX = window.innerWidth / 2;
       const windowHalfY = window.innerHeight / 2;
-      mouseX = (e.clientX - windowHalfX) * 0.0005;
-      mouseY = (e.clientY - windowHalfY) * 0.0005;
+      mouseX = (e.clientX - windowHalfX) * 0.0004;
+      mouseY = (e.clientY - windowHalfY) * 0.0004;
     };
     window.addEventListener('mousemove', onMouseMove);
 
@@ -100,23 +99,21 @@ export default function ThreeCanvas() {
       animationFrameId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth camera / mesh rotation
       targetX += (mouseX - targetX) * 0.05;
       targetY += (mouseY - targetY) * 0.05;
 
-      crystalMesh.rotation.y = elapsedTime * 0.08 + targetX * 2;
-      crystalMesh.rotation.x = elapsedTime * 0.05 + targetY * 2;
+      crystalMesh.rotation.y = elapsedTime * 0.07 + targetX * 1.5;
+      crystalMesh.rotation.x = elapsedTime * 0.04 + targetY * 1.5;
 
-      innerMesh.rotation.y = -elapsedTime * 0.12 - targetX;
-      innerMesh.rotation.z = elapsedTime * 0.08;
+      innerMesh.rotation.y = -elapsedTime * 0.1 - targetX;
+      innerMesh.rotation.z = elapsedTime * 0.06;
 
-      particlesMesh.rotation.y = -elapsedTime * 0.02;
+      particlesMesh.rotation.y = -elapsedTime * 0.015;
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // Resize Handler
     const handleResize = () => {
       if (!container) return;
       camera.aspect = container.clientWidth / container.clientHeight;
@@ -145,7 +142,7 @@ export default function ThreeCanvas() {
   return (
     <div
       ref={containerRef}
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-60"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-50"
       aria-hidden="true"
     />
   );

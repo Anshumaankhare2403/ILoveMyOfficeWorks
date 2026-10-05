@@ -63,19 +63,19 @@ export default function Uploader({ onFilesAdded, compact = false }) {
     return (
       <div
         {...getRootProps()}
-        className={`flex items-center justify-center gap-2 p-4 border border-dashed rounded-2xl cursor-pointer transition-all ${
+        className={`flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
           isDragActive
-            ? 'border-indigo-500 bg-indigo-500/10 text-indigo-300 scale-[0.99]'
-            : 'border-slate-800 hover:border-indigo-500/60 bg-slate-900/60 hover:bg-slate-900/90 text-slate-300'
+            ? 'border-[#8B9A6E] bg-[#8B9A6E]/10 text-[#55603F] scale-[0.99]'
+            : 'border-[#CBD5BE] hover:border-[#8B9A6E] bg-white/70 hover:bg-white text-[#58644A] shadow-sm'
         }`}
       >
         <input {...getInputProps()} />
         {isProcessing ? (
-          <Loader2 className="w-5 h-5 animate-spin text-indigo-400" />
+          <Loader2 className="w-5 h-5 animate-spin text-[#8B9A6E]" />
         ) : (
-          <Plus className="w-5 h-5 text-indigo-400" />
+          <Plus className="w-5 h-5 text-[#8B9A6E]" />
         )}
-        <span className="text-sm font-medium">
+        <span className="text-sm font-semibold">
           {isProcessing ? 'Inspecting PDF files...' : 'Add more PDF files (no limit)'}
         </span>
       </div>
@@ -85,48 +85,47 @@ export default function Uploader({ onFilesAdded, compact = false }) {
   return (
     <div className="w-full">
       <motion.div
-        whileHover={{ scale: 1.008 }}
+        whileHover={{ scale: 1.006 }}
         whileTap={{ scale: 0.995 }}
         {...getRootProps()}
-        className={`relative border-2 border-dashed rounded-3xl p-10 md:p-14 text-center cursor-pointer transition-all duration-300 backdrop-blur-xl ${
+        className={`relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center cursor-pointer transition-all duration-300 backdrop-blur-xl ${
           isDragActive
-            ? 'border-indigo-400 bg-indigo-600/15 shadow-2xl shadow-indigo-500/20'
-            : 'border-slate-800 hover:border-indigo-500/60 bg-slate-900/70 hover:bg-slate-900/90 shadow-xl'
+            ? 'border-[#8B9A6E] bg-[#8B9A6E]/15 shadow-xl shadow-[#8B9A6E]/15'
+            : 'border-[#CBD5BE] hover:border-[#8B9A6E] bg-white/80 hover:bg-white shadow-md shadow-[#EAE3D6]/50'
         }`}
       >
         <input {...getInputProps()} />
 
-        {/* Ambient glow behind icon */}
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="relative">
-            <div className="absolute inset-0 bg-indigo-500 rounded-2xl blur-xl opacity-30 animate-pulse" />
-            <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <div className="absolute inset-0 bg-[#8B9A6E] rounded-2xl blur-xl opacity-25 animate-pulse" />
+            <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-[#8B9A6E] via-[#97A678] to-[#718055] text-white flex items-center justify-center shadow-lg shadow-[#8B9A6E]/25">
               {isProcessing ? (
-                <Loader2 className="w-9 h-9 animate-spin" />
+                <Loader2 className="w-8 h-8 sm:w-9 sm:h-9 animate-spin" />
               ) : (
-                <UploadCloud className="w-9 h-9" />
+                <UploadCloud className="w-8 h-8 sm:w-9 sm:h-9" />
               )}
             </div>
           </div>
 
           <div>
-            <h3 className="text-xl font-bold text-white tracking-tight">
+            <h3 className="text-lg sm:text-xl font-bold text-[#262D20] tracking-tight">
               {isDragActive ? 'Drop your PDF files here' : 'Drop your PDF documents here'}
             </h3>
-            <p className="text-sm text-slate-400 mt-1.5">
+            <p className="text-xs sm:text-sm text-[#616D54] mt-1.5">
               or click to browse from your computer • Unlimited files supported
             </p>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
-            <span className="bg-slate-800/80 border border-slate-700/80 text-indigo-300 px-3 py-1 rounded-full font-mono font-medium">
+            <span className="bg-[#EBE4D8]/70 border border-[#D5DEC7] text-[#4E5941] px-3 py-1 rounded-full font-mono font-medium">
               .PDF
             </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">Max 200MB per file</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-emerald-400 flex items-center gap-1 font-medium">
-              <Sparkles className="w-3 h-3" /> 100% Client-Side Private
+            <span className="text-[#A5B297]">•</span>
+            <span className="text-[#6B785E]">Max 200MB per file</span>
+            <span className="text-[#A5B297]">•</span>
+            <span className="text-[#65734E] flex items-center gap-1 font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#8B9A6E]" /> 100% Private & Local
             </span>
           </div>
         </div>
@@ -138,9 +137,9 @@ export default function Uploader({ onFilesAdded, compact = false }) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mt-4 p-4 bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm rounded-2xl flex items-center gap-3"
+            className="mt-4 p-4 bg-rose-50 border border-rose-200 text-rose-800 text-sm rounded-2xl flex items-center gap-3 shadow-sm"
           >
-            <FileWarning className="w-5 h-5 shrink-0 text-rose-400" />
+            <FileWarning className="w-5 h-5 shrink-0 text-rose-600" />
             <span>{errorNotice}</span>
           </motion.div>
         )}

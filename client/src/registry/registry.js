@@ -1,4 +1,5 @@
 import mergePdfAdapter from './adapters/merge-pdf';
+import splitPdfAdapter from './adapters/split-pdf';
 
 /**
  * Adapter Registry
@@ -7,6 +8,7 @@ import mergePdfAdapter from './adapters/merge-pdf';
  */
 export const ADAPTER_REGISTRY = [
   mergePdfAdapter,
+  splitPdfAdapter,
 ];
 
 /**

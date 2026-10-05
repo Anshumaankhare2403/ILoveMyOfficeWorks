@@ -3,21 +3,37 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Files,
   Trash2,
-  ShieldCheck,
-  Sparkles,
   Layers,
-  ArrowRight,
+  Scissors,
+  ArrowLeft,
+  Sparkles,
 } from 'lucide-react';
 import ThreeCanvas from './components/ThreeCanvas';
+import SplashScreen from './components/SplashScreen';
+import Navbar from './components/Navbar';
+import HomeScreen from './components/HomeScreen';
 import Uploader from './components/Uploader';
 import FileCard from './components/FileCard';
 import OperationBar from './components/OperationBar';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'merge' | 'split'
   const [files, setFiles] = useState([]);
 
+  // Handles adding files from any uploader
   const handleFilesAdded = (newFiles) => {
     setFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  // Handles quick drop from the home screen
+  const handleHomeQuickUpload = (newFiles) => {
+    setFiles((prev) => [...prev, ...newFiles]);
+    if (newFiles.length === 1) {
+      setActiveTab('split');
+    } else {
+      setActiveTab('merge');
+    }
   };
 
   const handleRemoveFile = (id) => {
@@ -51,147 +67,260 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white font-sans">
+    <div className="relative min-h-screen bg-[#FAF8F4] text-[#262D20] flex flex-col selection:bg-[#8B9A6E] selection:text-white font-sans overflow-x-hidden">
+      {/* Splash Screen on Initial Load */}
+      <AnimatePresence>
+        {showSplash && (
+          <SplashScreen onComplete={() => setShowSplash(false)} />
+        )}
+      </AnimatePresence>
+
       {/* Interactive 3D Ambient Canvas Background */}
       <ThreeCanvas />
 
-      {/* Top Navigation / Header */}
-      <header className="relative z-10 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/80 sticky top-0">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-3 py-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-indigo-500 rounded-xl blur-md opacity-40" />
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-md">
-                <Sparkles className="w-5 h-5 text-indigo-100" />
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                  My Office Works
-                </h1>
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  Phase 1: PDF Merger
-                </span>
-              </div>
-              <p className="text-xs text-slate-400">
-                Personal Local PDF Toolkit • Zero Cloud
-              </p>
-            </div>
-          </div>
+      {/* Top Header / Navigation Bar */}
+      <Navbar
+        activeTab={activeTab}
+        onTabChange={(tab) => setActiveTab(tab)}
+        fileCounts={{
+          merge: files.length,
+          split: files.length,
+        }}
+      />
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 text-xs text-slate-300 bg-slate-800/80 border border-slate-700/60 px-3.5 py-1.5 rounded-full backdrop-blur-md">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>100% Private (Localhost Only)</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Main Content Area */}
+      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col">
+        <AnimatePresence mode="wait">
+          {activeTab === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+            >
+              <HomeScreen
+                onSelectTool={(toolId) => setActiveTab(toolId)}
+                onQuickUpload={handleHomeQuickUpload}
+                fileCounts={{
+                  merge: files.length,
+                  split: files.length,
+                }}
+              />
+            </motion.div>
+          )}
 
-      {/* Main Container */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex flex-col">
-        {files.length === 0 ? (
-          <div className="max-w-2xl mx-auto my-auto py-10 w-full">
-            <div className="text-center mb-8">
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3"
-              >
-                <Layers className="w-3.5 h-3.5" />
-                Unlimited Multi-PDF Merger
-              </motion.div>
-              <motion.h2
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight"
-              >
-                Merge Any Number of PDFs Instantly
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-slate-400 text-sm sm:text-base mt-2 max-w-lg mx-auto"
-              >
-                Drag and drop your documents. Reorder them effortlessly. Merge them with zero file count limits directly in your browser.
-              </motion.p>
-            </div>
-
-            <Uploader onFilesAdded={handleFilesAdded} />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Top Toolbar */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-                  <Files className="w-4 h-4" />
+          {activeTab === 'merge' && (
+            <motion.div
+              key="merge"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {/* Tool Header */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E8E1D5]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#8B9A6E] to-[#6F7D53] text-white flex items-center justify-center shadow-md shadow-[#8B9A6E]/20">
+                    <Layers className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg sm:text-xl font-bold text-[#262D20]">
+                        PDF Merger
+                      </h2>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8B9A6E]/15 text-[#4E593D] border border-[#8B9A6E]/30">
+                        Unlimited Files
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6B785E]">
+                      Combine multiple PDF documents sequentially with custom page ordering
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-base font-bold text-white">
-                    Loaded Documents ({files.length})
-                  </h2>
-                  <p className="text-xs text-slate-400">
-                    Use arrows to arrange the merge sequence
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={handleClearAll}
-                  className="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-xl hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20"
+                  onClick={() => setActiveTab('home')}
+                  className="text-xs text-[#55603F] hover:text-[#262D20] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD3C4] hover:border-[#8B9A6E] shadow-sm transition-all font-semibold"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Clear queue</span>
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to Home</span>
                 </button>
               </div>
-            </div>
 
-            {/* Split layout: Files on left/top, Operations on right/bottom */}
-            <div className="grid lg:grid-cols-12 gap-6 items-start">
-              {/* File list column */}
-              <div className="lg:col-span-7 space-y-3">
-                <AnimatePresence>
-                  {files.map((fileItem, idx) => (
-                    <FileCard
-                      key={fileItem.id}
-                      fileItem={fileItem}
-                      index={idx}
-                      totalFiles={files.length}
-                      onRemove={handleRemoveFile}
-                      onMoveUp={handleMoveUp}
-                      onMoveDown={handleMoveDown}
-                    />
-                  ))}
-                </AnimatePresence>
+              {files.length === 0 ? (
+                <div className="max-w-xl mx-auto py-10">
+                  <div className="text-center mb-6">
+                    <p className="text-sm text-[#6B785E]">
+                      Upload 2 or more PDF documents to merge them into a single file.
+                    </p>
+                  </div>
+                  <Uploader onFilesAdded={handleFilesAdded} />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* File Queue Toolbar */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#262D20]">
+                      <Files className="w-4 h-4 text-[#8B9A6E]" />
+                      <span>Document Queue ({files.length})</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClearAll}
+                      className="text-xs text-[#717E64] hover:text-rose-600 flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded-lg hover:bg-rose-50 font-medium"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear all</span>
+                    </button>
+                  </div>
 
-                {/* Compact dropzone to append more files */}
-                <Uploader onFilesAdded={handleFilesAdded} compact={true} />
+                  {/* Responsive grid: Left side list, Right side operations */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div className="lg:col-span-7 space-y-3 order-2 lg:order-1">
+                      <AnimatePresence>
+                        {files.map((fileItem, idx) => (
+                          <FileCard
+                            key={fileItem.id}
+                            fileItem={fileItem}
+                            index={idx}
+                            totalFiles={files.length}
+                            onRemove={handleRemoveFile}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                          />
+                        ))}
+                      </AnimatePresence>
+
+                      <Uploader onFilesAdded={handleFilesAdded} compact={true} />
+                    </div>
+
+                    <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-24">
+                      <OperationBar
+                        files={files}
+                        onReset={handleClearAll}
+                        activeToolId="merge-pdf"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {activeTab === 'split' && (
+            <motion.div
+              key="split"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {/* Tool Header */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E8E1D5]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#98A87D] to-[#718055] text-white flex items-center justify-center shadow-md shadow-[#8B9A6E]/20">
+                    <Scissors className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg sm:text-xl font-bold text-[#262D20]">
+                        PDF Splitter
+                      </h2>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8B9A6E]/15 text-[#4E593D] border border-[#8B9A6E]/30">
+                        Ranges & Chunks
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6B785E]">
+                      Break PDFs into separate files by page range or every N pages
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('home')}
+                  className="text-xs text-[#55603F] hover:text-[#262D20] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD3C4] hover:border-[#8B9A6E] shadow-sm transition-all font-semibold"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to Home</span>
+                </button>
               </div>
 
-              {/* Dynamic Operations & Adapter column */}
-              <div className="lg:col-span-5 sticky top-24">
-                <OperationBar files={files} onReset={handleClearAll} />
-              </div>
-            </div>
-          </div>
-        )}
+              {files.length === 0 ? (
+                <div className="max-w-xl mx-auto py-10">
+                  <div className="text-center mb-6">
+                    <p className="text-sm text-[#6B785E]">
+                      Upload a PDF document to split it into multiple parts.
+                    </p>
+                  </div>
+                  <Uploader onFilesAdded={handleFilesAdded} />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* File Queue Toolbar */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#262D20]">
+                      <Files className="w-4 h-4 text-[#8B9A6E]" />
+                      <span>Target Document (Primary: #{1} {files[0].name})</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClearAll}
+                      className="text-xs text-[#717E64] hover:text-rose-600 flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded-lg hover:bg-rose-50 font-medium"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear all</span>
+                    </button>
+                  </div>
+
+                  {/* Responsive grid: Left side list, Right side operations */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div className="lg:col-span-7 space-y-3 order-2 lg:order-1">
+                      <AnimatePresence>
+                        {files.map((fileItem, idx) => (
+                          <FileCard
+                            key={fileItem.id}
+                            fileItem={fileItem}
+                            index={idx}
+                            totalFiles={files.length}
+                            onRemove={handleRemoveFile}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                          />
+                        ))}
+                      </AnimatePresence>
+
+                      <Uploader onFilesAdded={handleFilesAdded} compact={true} />
+                    </div>
+
+                    <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-24">
+                      <OperationBar
+                        files={files}
+                        onReset={handleClearAll}
+                        activeToolId="split-pdf"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-slate-900/60 backdrop-blur-md py-4 mt-auto">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>My Office Works Engine Ready • No Cloud Uploads</span>
+      <footer className="relative z-10 border-t border-[#E8E1D5] bg-[#FAF8F4]/90 backdrop-blur-md py-4 mt-auto">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#738067] text-center sm:text-left">
+          <div className="flex items-center justify-center sm:justify-start gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#8B9A6E] animate-pulse" />
+            <span>ILoveMyOfficeWorks Engine Ready • 100% Client-Side</span>
           </div>
-          <div className="font-mono text-[11px] text-slate-400">
-            Phase 1 • Adapter Registry Pattern
+          <div className="font-mono text-[11px] text-[#616E53]">
+            Personal PDF Toolkit • Localhost
           </div>
         </div>
       </footer>
