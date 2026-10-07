@@ -29,6 +29,9 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
     customQuality: '0.65',
     customScale: '1.2',
     engine: 'browser',
+    conversionMode: 'flowable',
+    includePageBreaks: 'true',
+    detectHeadings: 'true',
   });
   const [isExecuting, setIsExecuting] = useState(false);
   const [progress, setProgress] = useState({ percent: 0, status: '' });
@@ -105,6 +108,8 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
         return <Scissors className="w-4 h-4" />;
       case 'compress-pdf':
         return <Minimize2 className="w-4 h-4" />;
+      case 'pdf-to-docx':
+        return <FileText className="w-4 h-4" />;
       default:
         return <Layers className="w-4 h-4" />;
     }
@@ -145,10 +150,10 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                     setExecutionResult(null);
                     setErrorMessage(null);
                   }}
-                  className={`relative px-3.5 py-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 ${
+                  className={`relative px-3.5 py-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
                     isSelected
-                      ? 'bg-gradient-to-r from-[#8B9A6E] to-[#6E7C52] text-white shadow-md shadow-[#8B9A6E]/25'
-                      : 'bg-[#FAF8F4] text-[#55603F] hover:bg-white hover:text-[#262D20] border border-[#DDD3C4]'
+                      ? 'bg-gradient-to-r from-[#5B7147] via-[#52663F] to-[#435433] text-white shadow-md shadow-[#5B7147]/25 border border-[#5B7147]/30'
+                      : 'bg-[#FAF8F4] text-[#4E5C46] hover:bg-white hover:text-[#1F271A] border border-[#DDD3C2]'
                   }`}
                 >
                   {getAdapterIcon(adapter.id)}
@@ -224,6 +229,8 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                               opt.id === 'outputFilename'
                                 ? activeAdapter?.id === 'compress-pdf'
                                   ? `${files[0]?.name?.replace(/\.pdf$/i, '') || 'document'}_compressed.pdf`
+                                  : activeAdapter?.id === 'pdf-to-docx'
+                                  ? `${files[0]?.name?.replace(/\.pdf$/i, '') || 'document'}.docx`
                                   : activeAdapter?.id === 'split-pdf'
                                   ? 'split_part'
                                   : 'merged-document.pdf'
@@ -280,7 +287,7 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                 type="button"
                 onClick={handleExecute}
                 disabled={!activeAdapter.isValid || isExecuting}
-                className="w-full py-3.5 px-6 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-[#8B9A6E] via-[#819065] to-[#6E7C52] hover:from-[#7C8B5F] hover:to-[#647249] text-white shadow-lg shadow-[#8B9A6E]/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none hover:scale-[1.008] active:scale-[0.995]"
+                className="w-full py-3.5 px-6 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-[#5B7147] via-[#52663F] to-[#435433] hover:from-[#52663F] hover:to-[#38462B] text-white shadow-lg shadow-[#5B7147]/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none hover:scale-[1.008] active:scale-[0.995]"
               >
                 {isExecuting ? (
                   <>
@@ -295,6 +302,8 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                         ? `Split PDF (${files[0]?.name || 'Document'})`
                         : activeAdapter.id === 'compress-pdf'
                         ? `Compress PDF (${files[0]?.name || 'Document'})`
+                        : activeAdapter.id === 'pdf-to-docx'
+                        ? `Convert to Word (.docx) (${files[0]?.name || 'Document'})`
                         : `Merge ${files.length} PDFs Sequentially`}
                     </span>
                   </>
@@ -386,7 +395,7 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
               <button
                 type="button"
                 onClick={() => triggerDownload()}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#8B9A6E] hover:bg-[#78875C] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-[#8B9A6E]/30 transition-all hover:scale-[1.01] active:scale-[0.99] min-w-0"
+                className="flex-1 py-3 px-4 rounded-xl bg-[#5B7147] hover:bg-[#4E623B] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-[#5B7147]/30 transition-all hover:scale-[1.01] active:scale-[0.99] min-w-0"
               >
                 {executionResult.isZip ? (
                   <Archive className="w-4 h-4 shrink-0" />
@@ -394,7 +403,11 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                   <Download className="w-4 h-4 shrink-0" />
                 )}
                 <span className="truncate">
-                  {executionResult.isZip ? 'Download All as ZIP' : 'Download PDF'}
+                  {executionResult.isZip
+                    ? 'Download All as ZIP'
+                    : executionResult.isDocx
+                    ? 'Download Word Document (.docx)'
+                    : 'Download PDF'}
                 </span>
               </button>
 

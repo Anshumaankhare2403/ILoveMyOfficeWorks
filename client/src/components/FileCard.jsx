@@ -19,15 +19,15 @@ export default function FileCard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="group relative bg-white border border-[#E2DAD0] hover:border-[#8B9A6E]/70 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between gap-4"
+      className="group relative bg-white border border-[#E2DAD0] hover:border-[#5B7147]/60 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between gap-4"
     >
       {/* File index sequence badge */}
-      <div className="w-8 h-8 rounded-xl bg-[#FAF8F4] text-[#586448] font-mono text-xs font-bold flex items-center justify-center shrink-0 border border-[#DDD3C4]">
+      <div className="w-8 h-8 rounded-xl bg-[#FAF8F4] text-[#4A573D] font-mono text-xs font-bold flex items-center justify-center shrink-0 border border-[#DDD3C2]">
         #{index + 1}
       </div>
 
       {/* File Icon */}
-      <div className="w-11 h-11 rounded-xl bg-[#8B9A6E]/12 text-[#586543] flex items-center justify-center shrink-0 border border-[#8B9A6E]/25">
+      <div className="w-11 h-11 rounded-xl bg-[#5B7147]/10 text-[#3F502F] flex items-center justify-center shrink-0 border border-[#5B7147]/20">
         <FileText className="w-5 h-5" />
       </div>
 

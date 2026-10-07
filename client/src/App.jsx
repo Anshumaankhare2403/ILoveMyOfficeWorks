@@ -6,6 +6,7 @@ import {
   Layers,
   Scissors,
   Minimize2,
+  FileText,
   ArrowLeft,
   Sparkles,
 } from 'lucide-react';
@@ -101,7 +102,7 @@ function MainApp() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#FAF8F4] text-[#262D20] flex flex-col selection:bg-[#8B9A6E] selection:text-white font-sans overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#FAF8F4] text-[#262D20] flex flex-col selection:bg-[#5B7147] selection:text-white font-sans overflow-x-hidden">
       {/* Splash Screen on Initial Load */}
       <AnimatePresence>
         {showSplash && (
@@ -120,6 +121,7 @@ function MainApp() {
           merge: files.length,
           split: files.length,
           compress: files.length,
+          docx: files.length,
         }}
       />
 
@@ -141,6 +143,7 @@ function MainApp() {
                   merge: files.length,
                   split: files.length,
                   compress: files.length,
+                  docx: files.length,
                 }}
               />
             </motion.div>
@@ -158,7 +161,7 @@ function MainApp() {
               {/* Tool Header */}
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E8E1D5]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#8B9A6E] to-[#6F7D53] text-white flex items-center justify-center shadow-md shadow-[#8B9A6E]/20">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#5B7147] to-[#435433] text-white flex items-center justify-center shadow-md shadow-[#5B7147]/20">
                     <Layers className="w-5 h-5" />
                   </div>
                   <div>
@@ -166,7 +169,7 @@ function MainApp() {
                       <h2 className="text-lg sm:text-xl font-bold text-[#262D20]">
                         PDF Merger
                       </h2>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8B9A6E]/15 text-[#4E593D] border border-[#8B9A6E]/30">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#3A4A2C] border border-[#5B7147]/20">
                         Unlimited Files
                       </span>
                     </div>
@@ -179,7 +182,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('home')}
-                  className="text-xs text-[#55603F] hover:text-[#262D20] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD3C4] hover:border-[#8B9A6E] shadow-sm transition-all font-semibold"
+                  className="text-xs text-[#3A4A2C] hover:text-[#1E2619] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-[#DDD3C2] hover:border-[#5B7147] shadow-sm transition-all font-semibold"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back to Home</span>
@@ -258,7 +261,7 @@ function MainApp() {
               {/* Tool Header */}
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E8E1D5]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#98A87D] to-[#718055] text-white flex items-center justify-center shadow-md shadow-[#8B9A6E]/20">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#5B7147] to-[#435433] text-white flex items-center justify-center shadow-md shadow-[#5B7147]/20">
                     <Scissors className="w-5 h-5" />
                   </div>
                   <div>
@@ -266,7 +269,7 @@ function MainApp() {
                       <h2 className="text-lg sm:text-xl font-bold text-[#262D20]">
                         PDF Splitter
                       </h2>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8B9A6E]/15 text-[#4E593D] border border-[#8B9A6E]/30">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#3A4A2C] border border-[#5B7147]/20">
                         Ranges & Chunks
                       </span>
                     </div>
@@ -279,7 +282,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('home')}
-                  className="text-xs text-[#55603F] hover:text-[#262D20] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD3C4] hover:border-[#8B9A6E] shadow-sm transition-all font-semibold"
+                  className="text-xs text-[#3A4A2C] hover:text-[#1E2619] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-[#DDD3C2] hover:border-[#5B7147] shadow-sm transition-all font-semibold"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back to Home</span>
@@ -300,7 +303,7 @@ function MainApp() {
                   {/* File Queue Toolbar */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-[#262D20]">
-                      <Files className="w-4 h-4 text-[#8B9A6E]" />
+                      <Files className="w-4 h-4 text-[#5B7147]" />
                       <span>Target Document (Primary: #{1} {files[0].name})</span>
                     </div>
                     <button
@@ -358,7 +361,7 @@ function MainApp() {
               {/* Tool Header */}
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E8E1D5]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6E7C52] to-[#55603F] text-white flex items-center justify-center shadow-md shadow-[#8B9A6E]/20">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#5B7147] to-[#435433] text-white flex items-center justify-center shadow-md shadow-[#5B7147]/20">
                     <Minimize2 className="w-5 h-5" />
                   </div>
                   <div>
@@ -366,7 +369,7 @@ function MainApp() {
                       <h2 className="text-lg sm:text-xl font-bold text-[#262D20]">
                         PDF Compressor
                       </h2>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8B9A6E]/15 text-[#4E593D] border border-[#8B9A6E]/30">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#3A4A2C] border border-[#5B7147]/20">
                         Object Streams & Ghostscript
                       </span>
                     </div>
@@ -379,7 +382,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('home')}
-                  className="text-xs text-[#55603F] hover:text-[#262D20] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD3C4] hover:border-[#8B9A6E] shadow-sm transition-all font-semibold"
+                  className="text-xs text-[#3A4A2C] hover:text-[#1E2619] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-[#DDD3C2] hover:border-[#5B7147] shadow-sm transition-all font-semibold"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back to Home</span>
@@ -400,7 +403,7 @@ function MainApp() {
                   {/* File Queue Toolbar */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-[#262D20]">
-                      <Files className="w-4 h-4 text-[#8B9A6E]" />
+                      <Files className="w-4 h-4 text-[#5B7147]" />
                       <span>Target Document (Primary: #{1} {files[0].name})</span>
                     </div>
                     <button
@@ -445,6 +448,106 @@ function MainApp() {
               )}
             </motion.div>
           )}
+
+          {(activeTab === 'docx' || activeTab === 'pdf-to-docx') && (
+            <motion.div
+              key="docx"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {/* Tool Header */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E8E1D5]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#5B7147] to-[#435433] text-white flex items-center justify-center shadow-md shadow-[#5B7147]/20">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg sm:text-xl font-bold text-[#262D20]">
+                        PDF to Word (DOCX)
+                      </h2>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#3A4A2C] border border-[#5B7147]/20">
+                        OpenXML Engine
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6B785E]">
+                      Convert PDF documents into fully editable Microsoft Word (.docx) files with typography and formatting
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('home')}
+                  className="text-xs text-[#3A4A2C] hover:text-[#1E2619] flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-[#DDD3C2] hover:border-[#5B7147] shadow-sm transition-all font-semibold"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to Home</span>
+                </button>
+              </div>
+
+              {files.length === 0 ? (
+                <div className="max-w-xl mx-auto py-10">
+                  <div className="text-center mb-6">
+                    <p className="text-sm text-[#6B785E]">
+                      Upload a PDF document to convert it into an editable Microsoft Word (.docx) file.
+                    </p>
+                  </div>
+                  <Uploader onFilesAdded={handleFilesAdded} />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* File Queue Toolbar */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#262D20]">
+                      <Files className="w-4 h-4 text-[#5B7147]" />
+                      <span>Target Document (Primary: #{1} {files[0].name})</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClearAll}
+                      className="text-xs text-[#717E64] hover:text-rose-600 flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded-lg hover:bg-rose-50 font-medium"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear all</span>
+                    </button>
+                  </div>
+
+                  {/* Responsive grid: Left side list, Right side operations */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div className="lg:col-span-7 space-y-3 order-2 lg:order-1">
+                      <AnimatePresence>
+                        {files.map((fileItem, idx) => (
+                          <FileCard
+                            key={fileItem.id}
+                            fileItem={fileItem}
+                            index={idx}
+                            totalFiles={files.length}
+                            onRemove={handleRemoveFile}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                          />
+                        ))}
+                      </AnimatePresence>
+
+                      <Uploader onFilesAdded={handleFilesAdded} compact={true} />
+                    </div>
+
+                    <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-24">
+                      <OperationBar
+                        files={files}
+                        onReset={handleClearAll}
+                        activeToolId="pdf-to-docx"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
 
@@ -452,7 +555,7 @@ function MainApp() {
       <footer className="relative z-10 border-t border-[#E8E1D5] bg-[#FAF8F4]/90 backdrop-blur-md py-4 mt-auto">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#738067] text-center sm:text-left">
           <div className="flex items-center justify-center sm:justify-start gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#8B9A6E] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#5B7147] animate-pulse" />
             <span>ILoveMyOfficeWorks Engine Ready • 100% Client-Side</span>
           </div>
           <div className="font-mono text-[11px] text-[#616E53]">
