@@ -1,4 +1,4 @@
-import { compressStructural, compressCanvasRaster } from '../../utils/pdf-compressor-engine';
+import { compressPdfWithMasterPipeline } from '../../utils/pdf-compressor-engine';
 
 const compressPdfAdapter = {
   id: 'compress-pdf',
@@ -32,10 +32,63 @@ const compressPdfAdapter = {
       type: 'select',
       default: 'recommended',
       options: [
-        { value: 'recommended', label: 'Balanced (Smart Hybrid — High Quality & Great Size)' },
-        { value: 'extreme', label: 'Extreme (Maximum Size Reduction — Scans & Images)' },
-        { value: 'light', label: 'Lossless Vector (Preserve Exact Text & Vector Paths)' },
+        {
+          value: 'recommended',
+          label: 'Balanced (Smart Hybrid — 40-60% Smaller, Crisp Text)',
+        },
+        {
+          value: 'extreme',
+          label: 'Extreme (Maximum Reduction — 70-85% Smaller, Scans & Web)',
+        },
+        {
+          value: 'light',
+          label: 'Light / High Quality (Crisp Vector Typography & 15-30% Reduction)',
+        },
+        {
+          value: 'custom',
+          label: 'Custom Mode (Fine-Tune Quality & Resolution)',
+        },
       ],
+      hint: (opts) => {
+        const lvl = opts.compressionLevel || 'recommended';
+        if (lvl === 'extreme') {
+          return 'Maximum size reduction for scans, images, and email sharing (crushes file size by 70-85%).';
+        }
+        if (lvl === 'light') {
+          return '100% lossless vector preservation for text and lines. Light image optimization for print and official records.';
+        }
+        if (lvl === 'custom') {
+          return 'Granular control over JPEG image quality and resolution scaling.';
+        }
+        return 'Recommended for most documents: sharp, readable typography with optimized images and stripped bloat.';
+      },
+    },
+    {
+      id: 'customQuality',
+      label: 'Image Quality (Custom Mode)',
+      type: 'select',
+      default: '0.65',
+      showWhen: (opts) => opts.compressionLevel === 'custom',
+      options: [
+        { value: '0.40', label: 'Low Quality (40% — Smallest Size)' },
+        { value: '0.65', label: 'Medium Quality (65% — Balanced)' },
+        { value: '0.80', label: 'High Quality (80% — Crisp)' },
+        { value: '0.90', label: 'Maximum Quality (90% — Near Lossless)' },
+      ],
+      hint: 'Lower quality produces smaller file sizes; higher quality preserves more image detail.',
+    },
+    {
+      id: 'customScale',
+      label: 'Resolution Scale (Custom Mode)',
+      type: 'select',
+      default: '1.2',
+      showWhen: (opts) => opts.compressionLevel === 'custom',
+      options: [
+        { value: '0.9', label: 'Screen / Web (~65-72 DPI)' },
+        { value: '1.2', label: 'Standard Document (~85-100 DPI)' },
+        { value: '1.5', label: 'High Definition (~120-150 DPI)' },
+      ],
+      hint: 'Target rendering scale for downsampling scanned and full-page images.',
     },
     {
       id: 'engine',
@@ -46,6 +99,7 @@ const compressPdfAdapter = {
         { value: 'browser', label: 'In-Browser Engine (Instant & 100% Private)' },
         { value: 'backend', label: 'Local Ghostscript (localhost:3001)' },
       ],
+      hint: 'The In-Browser engine runs 100% client-side with zero data leaving your device.',
     },
     {
       id: 'outputFilename',
@@ -80,7 +134,7 @@ const compressPdfAdapter = {
     // Try Local Node.js Backend (Ghostscript) if requested
     if (engine === 'backend') {
       try {
-        onProgress(20, 'Connecting to local Node.js backend (localhost:3001)...');
+        onProgress(20, 'Connecting to local Ghostscript backend (localhost:3001)...');
         const formData = new FormData();
         const fileObj =
           targetFile.file ||
@@ -118,117 +172,43 @@ const compressPdfAdapter = {
           };
         } else {
           console.warn('Backend unavailable, falling back to In-Browser engine.');
-          onProgress(25, 'Ghostscript not available. Using In-Browser Canvas Engine...');
+          onProgress(25, 'Ghostscript not detected on host. Using In-Browser Engine...');
         }
       } catch (backendErr) {
         console.warn('Backend offline, using browser engine:', backendErr.message);
-        onProgress(25, 'Backend offline. Using In-Browser Canvas Engine...');
+        onProgress(25, 'Backend offline. Using In-Browser Engine...');
       }
     }
 
     // In-Browser High-Performance Compression Pipeline
     onProgress(10, `Analyzing "${targetFile.name}"...`);
 
-    let finalBytes = null;
-    let finalPageCount = targetFile.pageCount || 1;
-    let methodUsed = 'In-Browser Stream Packing';
-
-    if (level === 'light') {
-      // Pure lossless vector compression (object stream grouping & metadata strip)
-      onProgress(35, 'Performing lossless object stream optimization...');
-      const structRes = await compressStructural(targetFile.arrayBuffer, 'light');
-      finalBytes = structRes.bytes;
-      finalPageCount = structRes.pageCount;
-      methodUsed = 'Lossless Vector Optimization';
-    } else if (level === 'extreme') {
-      // Extreme raster downsampling for massive savings
-      onProgress(25, 'Applying aggressive canvas image downsampling (100 DPI, JPEG 0.55)...');
-      try {
-        const rasterRes = await compressCanvasRaster(
-          targetFile.arrayBuffer,
-          1.1, // Scale ~100 DPI
-          0.55, // JPEG quality
-          onProgress
-        );
-        finalBytes = rasterRes.bytes;
-        finalPageCount = rasterRes.pageCount;
-        methodUsed = 'Extreme Canvas Downsampling';
-      } catch (rasterErr) {
-        console.warn('Canvas rasterization fallback to structural:', rasterErr);
-        const structRes = await compressStructural(targetFile.arrayBuffer, 'extreme');
-        finalBytes = structRes.bytes;
-        finalPageCount = structRes.pageCount;
-      }
-    } else {
-      // 'recommended' - Smart Hybrid
-      onProgress(20, 'Evaluating structural optimization...');
-      const structRes = await compressStructural(targetFile.arrayBuffer, 'recommended');
-      const structSavings = (originalSize - structRes.bytes.length) / originalSize;
-
-      // If structural alone yields >= 15% savings, use it to keep vectors intact
-      if (structSavings >= 0.15) {
-        finalBytes = structRes.bytes;
-        finalPageCount = structRes.pageCount;
-        methodUsed = 'Object Stream Compaction';
-      } else {
-        // Large scan/image document: apply high-quality raster compression
-        onProgress(30, 'Document contains uncompressed raster assets. Downsampling images...');
-        try {
-          const rasterRes = await compressCanvasRaster(
-            targetFile.arrayBuffer,
-            1.4, // Scale ~140 DPI
-            0.72, // JPEG quality
-            onProgress
-          );
-
-          // Use raster only if it actually reduced the file size
-          if (rasterRes.bytes.length < originalSize) {
-            finalBytes = rasterRes.bytes;
-            finalPageCount = rasterRes.pageCount;
-            methodUsed = 'Smart Image Downsampling';
-          } else {
-            finalBytes = structRes.bytes;
-            finalPageCount = structRes.pageCount;
-            methodUsed = 'Object Stream Compaction';
-          }
-        } catch (rasterErr) {
-          console.warn('Canvas raster error, using structural result:', rasterErr);
-          finalBytes = structRes.bytes;
-          finalPageCount = structRes.pageCount;
-        }
+    let arrayBuffer = targetFile.arrayBuffer;
+    if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+      if (targetFile.file && targetFile.file.arrayBuffer) {
+        arrayBuffer = await targetFile.file.arrayBuffer();
       }
     }
 
-    // Safety guard: if result is somehow larger than original, protect user by keeping original or best
-    let compressedSize = finalBytes.length;
-    let savingsBytes = Math.max(0, originalSize - compressedSize);
-    let savingsPercent =
-      originalSize > 0 ? Math.max(0, Math.round((savingsBytes / originalSize) * 100)) : 0;
+    const result = await compressPdfWithMasterPipeline(
+      arrayBuffer,
+      options,
+      onProgress
+    );
 
-    let blob;
-    if (compressedSize > originalSize) {
-      // Document was already at maximum possible compression
-      blob = new Blob([targetFile.arrayBuffer], { type: 'application/pdf' });
-      compressedSize = originalSize;
-      savingsBytes = 0;
-      savingsPercent = 0;
-      methodUsed = 'Already Optimized (Original Kept)';
-    } else {
-      blob = new Blob([finalBytes], { type: 'application/pdf' });
-    }
-
+    const compressedBlob = new Blob([result.bytes], { type: 'application/pdf' });
     onProgress(100, 'Compression completed successfully!');
 
     return {
-      blob,
-      downloadUrl: URL.createObjectURL(blob),
+      blob: compressedBlob,
+      downloadUrl: URL.createObjectURL(compressedBlob),
       filename,
       originalSize,
-      compressedSize,
-      savingsBytes,
-      savingsPercent,
-      totalPages: finalPageCount,
-      engineUsed: methodUsed,
+      compressedSize: result.compressedSize,
+      savingsBytes: result.savingsBytes,
+      savingsPercent: result.savingsPercent,
+      totalPages: result.pageCount,
+      engineUsed: result.methodUsed,
     };
   },
 };

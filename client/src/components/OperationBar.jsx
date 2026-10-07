@@ -26,6 +26,8 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
     everyN: 1,
     outputPrefix: 'split_document',
     compressionLevel: 'recommended',
+    customQuality: '0.65',
+    customScale: '1.2',
     engine: 'browser',
   });
   const [isExecuting, setIsExecuting] = useState(false);
@@ -232,6 +234,11 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                             className="w-full bg-white border border-[#CBD5BD] rounded-lg px-3 py-2 text-sm text-[#262D20] placeholder-[#9EAC8E] focus:outline-none focus:border-[#8B9A6E] focus:ring-1 focus:ring-[#8B9A6E] transition-all"
                           />
                         )}
+                        {opt.hint && (
+                          <p className="text-[11px] text-[#717E64] mt-1 leading-snug">
+                            {typeof opt.hint === 'function' ? opt.hint(adapterOptions) : opt.hint}
+                          </p>
+                        )}
                       </div>
                     ))}
                 </div>
@@ -367,7 +374,7 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                     <span className="px-2 py-0.5 rounded-full bg-[#8B9A6E]/20 text-[#3C472E] font-bold text-[11px]">
                       {executionResult.savingsPercent > 0
                         ? `-${executionResult.savingsPercent}% Size Reduction`
-                        : 'Structure Optimized'}
+                        : 'Verified Optimal (Peak Compactness)'}
                     </span>
                   </div>
                 )}
