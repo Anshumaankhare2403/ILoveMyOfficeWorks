@@ -55,8 +55,8 @@ export default function SplashScreen({ onComplete }) {
         >
           <div className="absolute inset-0 bg-[#8B9A6E] rounded-3xl blur-2xl opacity-30 animate-pulse" />
           <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-[#8B9A6E] via-[#A3B588] to-[#BDCBA8] p-0.5 shadow-2xl shadow-[#8B9A6E]/20">
-            <div className="w-full h-full bg-[#FAF8F4] rounded-[22px] backdrop-blur-md flex items-center justify-center shadow-inner">
-              <Heart className="w-10 h-10 sm:w-12 sm:h-12 text-[#8B9A6E] fill-[#8B9A6E]/20 animate-pulse" />
+            <div className="w-full h-full bg-[#FAF8F4] rounded-[22px] overflow-hidden flex items-center justify-center shadow-inner">
+              <img src="/logo.png" alt="ILoveMyOfficeWorks" className="w-full h-full object-cover" />
             </div>
           </div>
         </motion.div>

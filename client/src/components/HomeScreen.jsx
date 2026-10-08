@@ -496,6 +496,22 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
       {/* Hero Section */}
       <div className="text-center space-y-4">
         <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="flex justify-center"
+        >
+          <div className="relative group">
+            <div className="absolute inset-0 bg-[#5B7147] rounded-3xl blur-xl opacity-20 group-hover:opacity-35 transition-opacity" />
+            <img
+              src="/logo.png"
+              alt="ILoveMyOfficeWorks Logo"
+              className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover shadow-xl shadow-[#5B7147]/15 border border-[#DDD3C2] group-hover:scale-105 transition-transform"
+            />
+          </div>
+        </motion.div>
+
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5B7147]/10 border border-[#5B7147]/25 text-[#435433] text-xs font-bold uppercase tracking-wider"
