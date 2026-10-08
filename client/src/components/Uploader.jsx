@@ -16,7 +16,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
       if (firstRejection.file.size > MAX_FILE_SIZE) {
         setErrorNotice('One or more files exceed the 200MB size limit.');
       } else {
-        setErrorNotice('Only PDF documents are allowed.');
+        setErrorNotice('Unsupported file format. Please upload PDF, images, or Office documents.');
       }
       return;
     }
@@ -54,6 +54,13 @@ export default function Uploader({ onFilesAdded, compact = false }) {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
+      'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+      'text/html': ['.html', '.htm'],
+      'text/csv': ['.csv'],
+      'text/plain': ['.txt'],
     },
     maxSize: MAX_FILE_SIZE,
     multiple: true,
@@ -65,18 +72,18 @@ export default function Uploader({ onFilesAdded, compact = false }) {
         {...getRootProps()}
         className={`flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
           isDragActive
-            ? 'border-[#8B9A6E] bg-[#8B9A6E]/10 text-[#55603F] scale-[0.99]'
-            : 'border-[#CBD5BE] hover:border-[#8B9A6E] bg-white/70 hover:bg-white text-[#58644A] shadow-sm'
+            ? 'border-[#5B7147] bg-[#5B7147]/10 text-[#3A4A2C] scale-[0.99]'
+            : 'border-[#DDD3C2] hover:border-[#5B7147] bg-white/80 hover:bg-white text-[#4A573E] shadow-sm'
         }`}
       >
         <input {...getInputProps()} />
         {isProcessing ? (
-          <Loader2 className="w-5 h-5 animate-spin text-[#8B9A6E]" />
+          <Loader2 className="w-5 h-5 animate-spin text-[#5B7147]" />
         ) : (
-          <Plus className="w-5 h-5 text-[#8B9A6E]" />
+          <Plus className="w-5 h-5 text-[#5B7147]" />
         )}
         <span className="text-sm font-semibold">
-          {isProcessing ? 'Inspecting PDF files...' : 'Add more PDF files (no limit)'}
+          {isProcessing ? 'Inspecting files...' : 'Add more files (PDF, images, documents)'}
         </span>
       </div>
     );
@@ -90,16 +97,16 @@ export default function Uploader({ onFilesAdded, compact = false }) {
         {...getRootProps()}
         className={`relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center cursor-pointer transition-all duration-300 backdrop-blur-xl ${
           isDragActive
-            ? 'border-[#8B9A6E] bg-[#8B9A6E]/15 shadow-xl shadow-[#8B9A6E]/15'
-            : 'border-[#CBD5BE] hover:border-[#8B9A6E] bg-white/80 hover:bg-white shadow-md shadow-[#EAE3D6]/50'
+            ? 'border-[#5B7147] bg-[#5B7147]/10 shadow-xl shadow-[#5B7147]/15'
+            : 'border-[#DDD3C2] hover:border-[#5B7147] bg-white/85 hover:bg-white shadow-md shadow-[#E2D9C8]/40'
         }`}
       >
         <input {...getInputProps()} />
 
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#8B9A6E] rounded-2xl blur-xl opacity-25 animate-pulse" />
-            <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-[#8B9A6E] via-[#97A678] to-[#718055] text-white flex items-center justify-center shadow-lg shadow-[#8B9A6E]/25">
+            <div className="absolute inset-0 bg-[#5B7147] rounded-2xl blur-xl opacity-20 animate-pulse" />
+            <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-[#5B7147] via-[#657E4E] to-[#435433] text-white flex items-center justify-center shadow-lg shadow-[#5B7147]/25">
               {isProcessing ? (
                 <Loader2 className="w-8 h-8 sm:w-9 sm:h-9 animate-spin" />
               ) : (
@@ -110,7 +117,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
 
           <div>
             <h3 className="text-lg sm:text-xl font-bold text-[#262D20] tracking-tight">
-              {isDragActive ? 'Drop your PDF files here' : 'Drop your PDF documents here'}
+              {isDragActive ? 'Drop your files here' : 'Drop your documents or images here'}
             </h3>
             <p className="text-xs sm:text-sm text-[#616D54] mt-1.5">
               or click to browse from your computer • Unlimited files supported
@@ -118,14 +125,14 @@ export default function Uploader({ onFilesAdded, compact = false }) {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
-            <span className="bg-[#EBE4D8]/70 border border-[#D5DEC7] text-[#4E5941] px-3 py-1 rounded-full font-mono font-medium">
-              .PDF
+            <span className="bg-[#FAF8F4] border border-[#DDD3C2] text-[#4E5941] px-3 py-1 rounded-full font-mono font-medium">
+              PDF • JPG • PNG • DOCX
             </span>
-            <span className="text-[#A5B297]">•</span>
+            <span className="text-[#BDC8B3]">•</span>
             <span className="text-[#6B785E]">Max 200MB per file</span>
-            <span className="text-[#A5B297]">•</span>
-            <span className="text-[#65734E] flex items-center gap-1 font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-[#8B9A6E]" /> 100% Private & Local
+            <span className="text-[#BDC8B3]">•</span>
+            <span className="text-[#4A583A] flex items-center gap-1 font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#5B7147]" /> 100% Private & Local
             </span>
           </div>
         </div>

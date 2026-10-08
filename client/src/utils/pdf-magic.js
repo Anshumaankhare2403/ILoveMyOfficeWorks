@@ -37,9 +37,76 @@ export async function inspectPdfFile(file) {
     throw new Error('File too large (max 200MB limit)');
   }
 
+  const nameLower = (file.name || '').toLowerCase();
+  const mime = (file.type || '').toLowerCase();
+
+  // Check if image file
+  const isImage =
+    mime.startsWith('image/') ||
+    ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif', '.svg'].some((ext) =>
+      nameLower.endsWith(ext)
+    );
+
+  if (isImage) {
+    const arrayBuffer = await file.arrayBuffer();
+    let dimensions = null;
+    try {
+      if (typeof createImageBitmap === 'function') {
+        const bitmap = await createImageBitmap(new Blob([arrayBuffer]));
+        dimensions = { width: bitmap.width, height: bitmap.height };
+        bitmap.close?.();
+      }
+    } catch {
+      // Ignored if unsupported image format
+    }
+
+    return {
+      file,
+      name: file.name,
+      size: file.size,
+      formattedSize: formatFileSize(file.size),
+      pageCount: 1,
+      isImage: true,
+      imageDimensions: dimensions,
+      isEncrypted: false,
+      error: null,
+      arrayBuffer,
+    };
+  }
+
+  // Check if Office / Document file (.docx, .xlsx, .pptx, .html, .txt)
+  const isOfficeOrHtml = [
+    '.docx',
+    '.doc',
+    '.xlsx',
+    '.xls',
+    '.pptx',
+    '.ppt',
+    '.html',
+    '.htm',
+    '.txt',
+    '.csv',
+  ].some((ext) => nameLower.endsWith(ext));
+
+  if (isOfficeOrHtml) {
+    const arrayBuffer = await file.arrayBuffer();
+    return {
+      file,
+      name: file.name,
+      size: file.size,
+      formattedSize: formatFileSize(file.size),
+      pageCount: 1,
+      isOfficeDoc: true,
+      isEncrypted: false,
+      error: null,
+      arrayBuffer,
+    };
+  }
+
+  // Standard PDF Verification
   const isMagicPdf = await verifyPdfMagicBytes(file);
   if (!isMagicPdf) {
-    throw new Error('Invalid file type: Missing PDF signature (%PDF-)');
+    throw new Error('Unsupported format: Please upload a PDF, image, or document file');
   }
 
   const arrayBuffer = await file.arrayBuffer();
@@ -55,6 +122,7 @@ export async function inspectPdfFile(file) {
       size: file.size,
       formattedSize: formatFileSize(file.size),
       pageCount,
+      isPdf: true,
       isEncrypted,
       error: isEncrypted ? 'PDF is encrypted (password required)' : null,
       arrayBuffer,
@@ -68,6 +136,7 @@ export async function inspectPdfFile(file) {
         size: file.size,
         formattedSize: formatFileSize(file.size),
         pageCount: null,
+        isPdf: true,
         isEncrypted: true,
         error: 'PDF is encrypted',
         arrayBuffer,
@@ -77,3 +146,4 @@ export async function inspectPdfFile(file) {
     throw new Error(`Failed to read PDF structure: ${err.message || 'Corrupt file'}`);
   }
 }
+

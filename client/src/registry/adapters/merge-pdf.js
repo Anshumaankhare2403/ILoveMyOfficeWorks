@@ -70,7 +70,13 @@ const mergePdfAdapter = {
       // Load source PDF
       let sourcePdf;
       try {
-        sourcePdf = await PDFDocument.load(fileItem.arrayBuffer, {
+        let arrayBuffer = fileItem.arrayBuffer;
+        if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+          if (fileItem.file && typeof fileItem.file.arrayBuffer === 'function') {
+            arrayBuffer = await fileItem.file.arrayBuffer();
+          }
+        }
+        sourcePdf = await PDFDocument.load(arrayBuffer, {
           ignoreEncryption: true,
         });
       } catch (err) {
@@ -92,7 +98,7 @@ const mergePdfAdapter = {
     }
 
     onProgress(92, 'Generating final merged PDF file...');
-    const mergedBytes = await mergedPdf.save();
+    const mergedBytes = await mergedPdf.save({ useObjectStreams: true });
 
     onProgress(100, 'Merge completed successfully!');
 
@@ -104,12 +110,21 @@ const mergePdfAdapter = {
     const blob = new Blob([mergedBytes], { type: 'application/pdf' });
 
     return {
+      success: true,
       blob,
       downloadUrl: URL.createObjectURL(blob),
       filename,
       totalPages: totalMergedPages,
       fileSize: mergedBytes.length,
       fileCount: files.length,
+      isPdf: true,
+      files: [
+        {
+          name: filename,
+          blob,
+          type: 'application/pdf',
+        },
+      ],
     };
   },
 };

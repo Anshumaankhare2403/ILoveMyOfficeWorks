@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
+    "docx": "^9.9.0",
     "framer-motion": "^14.0.0",
     "jszip": "^3.10.2",
     "lucide-react": "^0.475.0",

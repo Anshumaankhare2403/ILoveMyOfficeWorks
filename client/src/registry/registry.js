@@ -1,6 +1,44 @@
+// 1. Organize PDF
 import mergePdfAdapter from './adapters/merge-pdf';
 import splitPdfAdapter from './adapters/split-pdf';
+import removePagesAdapter from './adapters/remove-pages';
+import extractPagesAdapter from './adapters/extract-pages';
+import organizePdfAdapter from './adapters/organize-pdf';
+import scanToPdfAdapter from './adapters/scan-to-pdf';
+
+// 2. Optimize PDF
 import compressPdfAdapter from './adapters/compress-pdf';
+import repairPdfAdapter from './adapters/repair-pdf';
+import ocrPdfAdapter from './adapters/ocr-pdf';
+
+// 3. Convert to PDF
+import jpgToPdfAdapter from './adapters/jpg-to-pdf';
+import wordToPdfAdapter from './adapters/word-to-pdf';
+import powerpointToPdfAdapter from './adapters/powerpoint-to-pdf';
+import excelToPdfAdapter from './adapters/excel-to-pdf';
+import htmlToPdfAdapter from './adapters/html-to-pdf';
+
+// 4. Convert from PDF
+import pdfToJpgAdapter from './adapters/pdf-to-jpg';
+import pdfToDocxAdapter from './adapters/pdf-to-docx';
+import pdfToPowerpointAdapter from './adapters/pdf-to-powerpoint';
+import pdfToExcelAdapter from './adapters/pdf-to-excel';
+import pdfToPdfaAdapter from './adapters/pdf-to-pdfa';
+
+// 5. Edit PDF
+import rotatePdfAdapter from './adapters/rotate-pdf';
+import addPageNumbersAdapter from './adapters/add-page-numbers';
+import addWatermarkAdapter from './adapters/add-watermark';
+import cropPdfAdapter from './adapters/crop-pdf';
+import editPdfAdapter from './adapters/edit-pdf';
+import pdfFormsAdapter from './adapters/pdf-forms';
+
+// 6. PDF Security
+import unlockPdfAdapter from './adapters/unlock-pdf';
+import protectPdfAdapter from './adapters/protect-pdf';
+import signPdfAdapter from './adapters/sign-pdf';
+import redactPdfAdapter from './adapters/redact-pdf';
+import comparePdfAdapter from './adapters/compare-pdf';
 
 /**
  * Adapter Registry
@@ -8,9 +46,47 @@ import compressPdfAdapter from './adapters/compress-pdf';
  * implementing the adapter module and appending it to this list.
  */
 export const ADAPTER_REGISTRY = [
+  // 1. Organize PDF
   mergePdfAdapter,
   splitPdfAdapter,
+  removePagesAdapter,
+  extractPagesAdapter,
+  organizePdfAdapter,
+  scanToPdfAdapter,
+
+  // 2. Optimize PDF
   compressPdfAdapter,
+  repairPdfAdapter,
+  ocrPdfAdapter,
+
+  // 3. Convert to PDF
+  jpgToPdfAdapter,
+  wordToPdfAdapter,
+  powerpointToPdfAdapter,
+  excelToPdfAdapter,
+  htmlToPdfAdapter,
+
+  // 4. Convert from PDF
+  pdfToJpgAdapter,
+  pdfToDocxAdapter,
+  pdfToPowerpointAdapter,
+  pdfToExcelAdapter,
+  pdfToPdfaAdapter,
+
+  // 5. Edit PDF
+  rotatePdfAdapter,
+  addPageNumbersAdapter,
+  addWatermarkAdapter,
+  cropPdfAdapter,
+  editPdfAdapter,
+  pdfFormsAdapter,
+
+  // 6. PDF Security
+  unlockPdfAdapter,
+  protectPdfAdapter,
+  signPdfAdapter,
+  redactPdfAdapter,
+  comparePdfAdapter,
 ];
 
 /**

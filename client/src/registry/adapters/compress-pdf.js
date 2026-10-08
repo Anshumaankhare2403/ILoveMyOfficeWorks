@@ -200,15 +200,25 @@ const compressPdfAdapter = {
     onProgress(100, 'Compression completed successfully!');
 
     return {
+      success: true,
       blob: compressedBlob,
       downloadUrl: URL.createObjectURL(compressedBlob),
       filename,
+      fileSize: compressedBlob.size,
       originalSize,
       compressedSize: result.compressedSize,
       savingsBytes: result.savingsBytes,
       savingsPercent: result.savingsPercent,
       totalPages: result.pageCount,
+      isPdf: true,
       engineUsed: result.methodUsed,
+      files: [
+        {
+          name: filename,
+          blob: compressedBlob,
+          type: 'application/pdf',
+        },
+      ],
     };
   },
 };
