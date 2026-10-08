@@ -52,19 +52,21 @@ In earlier iterations, tool navigation tabs (like `Merge PDFs` and `PDF to Word`
 
 ---
 
-## 4. Glassmorphism & Floating Navigation
+## 4. Glassmorphism & Section Dropdown Navigation (`Navbar.jsx`)
 
-The top navigation bar is implemented as a floating island rather than an edge-to-edge box:
+The top navigation bar is implemented as a floating luxury island with section dropdown menus:
 - **Surface**: `bg-[#EDE7DC]/80 backdrop-blur-md`
 - **Border**: `border border-[#DDD3C2]`
-- **Active Tab Pill**: Uses Framer Motion's `layoutId="activeNavIndicator"` to glide smoothly between tabs with spring physics:
-  ```jsx
-  <motion.div
-    layoutId="activeNavIndicator"
-    className="absolute inset-0 bg-gradient-to-r from-[#5B7147] to-[#435433] rounded-xl shadow-md shadow-[#5B7147]/20"
-    transition={{ type: 'spring', bounce: 0.18, duration: 0.4 }}
-  />
-  ```
+- **Section Dropdown Groups**:
+  - `Home`: Direct jump to dashboard
+  - `Convert to PDF ▾`: JPG to PDF, WORD to PDF, POWERPOINT to PDF, EXCEL to PDF, HTML to PDF
+  - `Convert from PDF ▾`: PDF to JPG, PDF to WORD, PDF to POWERPOINT, PDF to EXCEL, PDF to PDF/A
+  - `PDF Tools ▾`: Merge PDF, Split PDF, Compress PDF
+- **Interaction**:
+  - Click & hover toggles with smooth Framer Motion spring dropdown animations.
+  - Automatic click-outside detection via document mousedown listener.
+  - Active tool state highlights with deep sage gradient pill (`#5B7147` to `#435433`).
+  - Responsive mobile drawer accordion for small screens.
 
 ---
 

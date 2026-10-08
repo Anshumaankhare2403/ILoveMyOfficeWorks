@@ -109,6 +109,7 @@ const pdfToDocxAdapter = {
     );
 
     return {
+      success: true,
       blob: result.blob,
       downloadUrl: URL.createObjectURL(result.blob),
       filename,
@@ -117,6 +118,13 @@ const pdfToDocxAdapter = {
       totalParagraphs: result.totalParagraphs,
       isDocx: true,
       engineUsed: 'In-Browser OpenXML Engine',
+      files: [
+        {
+          name: filename,
+          blob: result.blob,
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        },
+      ],
     };
   },
 };

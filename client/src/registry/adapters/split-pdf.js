@@ -115,7 +115,14 @@ const splitPdfAdapter = {
     const targetFile = files[0];
     onProgress(5, `Loading "${targetFile.name}"...`);
 
-    const sourcePdf = await PDFDocument.load(targetFile.arrayBuffer, {
+    let arrayBuffer = targetFile.arrayBuffer;
+    if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+      if (targetFile.file && typeof targetFile.file.arrayBuffer === 'function') {
+        arrayBuffer = await targetFile.file.arrayBuffer();
+      }
+    }
+
+    const sourcePdf = await PDFDocument.load(arrayBuffer, {
       ignoreEncryption: true,
     });
 
@@ -165,7 +172,7 @@ const splitPdfAdapter = {
         partPdf.addPage(page);
       }
 
-      const partBytes = await partPdf.save();
+      const partBytes = await partPdf.save({ useObjectStreams: true });
       const partBlob = new Blob([partBytes], { type: 'application/pdf' });
       const partFilename = `${prefix}_${i + 1}_pages_${group[0] + 1}-${group[group.length - 1] + 1}.pdf`;
 
@@ -185,26 +192,36 @@ const splitPdfAdapter = {
 
     let downloadUrl;
     let mainFilename;
+    let mainBlob;
 
     if (parts.length === 1) {
+      mainBlob = parts[0].blob;
       downloadUrl = parts[0].downloadUrl;
       mainFilename = parts[0].filename;
     } else {
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      downloadUrl = URL.createObjectURL(zipBlob);
+      mainBlob = await zip.generateAsync({ type: 'blob' });
+      downloadUrl = URL.createObjectURL(mainBlob);
       mainFilename = `${prefix}_all_parts.zip`;
     }
 
     onProgress(100, `Successfully split into ${parts.length} parts!`);
 
     return {
+      success: true,
+      blob: mainBlob,
       downloadUrl,
       filename: mainFilename,
+      fileSize: mainBlob.size,
       parts,
       totalPages,
       totalParts: parts.length,
       isZip: parts.length > 1,
       sourceFileName: targetFile.name,
+      files: parts.map((p) => ({
+        name: p.filename,
+        blob: p.blob,
+        type: 'application/pdf',
+      })),
     };
   },
 };

@@ -2,6 +2,15 @@ import mergePdfAdapter from './adapters/merge-pdf';
 import splitPdfAdapter from './adapters/split-pdf';
 import compressPdfAdapter from './adapters/compress-pdf';
 import pdfToDocxAdapter from './adapters/pdf-to-docx';
+import jpgToPdfAdapter from './adapters/jpg-to-pdf';
+import pdfToJpgAdapter from './adapters/pdf-to-jpg';
+import pdfToExcelAdapter from './adapters/pdf-to-excel';
+import pdfToPdfaAdapter from './adapters/pdf-to-pdfa';
+import htmlToPdfAdapter from './adapters/html-to-pdf';
+import wordToPdfAdapter from './adapters/word-to-pdf';
+import excelToPdfAdapter from './adapters/excel-to-pdf';
+import powerpointToPdfAdapter from './adapters/powerpoint-to-pdf';
+import pdfToPowerpointAdapter from './adapters/pdf-to-powerpoint';
 
 /**
  * Adapter Registry
@@ -9,10 +18,24 @@ import pdfToDocxAdapter from './adapters/pdf-to-docx';
  * implementing the adapter module and appending it to this list.
  */
 export const ADAPTER_REGISTRY = [
+  // Core PDF Tools
   mergePdfAdapter,
   splitPdfAdapter,
   compressPdfAdapter,
+
+  // Convert to PDF
+  jpgToPdfAdapter,
+  wordToPdfAdapter,
+  powerpointToPdfAdapter,
+  excelToPdfAdapter,
+  htmlToPdfAdapter,
+
+  // Convert from PDF
+  pdfToJpgAdapter,
   pdfToDocxAdapter,
+  pdfToPowerpointAdapter,
+  pdfToExcelAdapter,
+  pdfToPdfaAdapter,
 ];
 
 /**

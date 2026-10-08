@@ -1,155 +1,86 @@
 # ILoveMyOfficeWorks — Personal PDF Toolkit 📄✨
 
-A personal, private, client-first PDF toolkit web application built with **React (Vite)**, **Tailwind CSS**, **Framer Motion**, and **Three.js**, with a lightweight local **Node.js backend**, designed with a tranquil, elegant warm cream and sage green (`#8B9A6E`) palette.
+A personal, private, client-first PDF and document conversion suite built with **React (Vite)**, **Tailwind CSS**, **Framer Motion**, and **Three.js**, with a lightweight local **Node.js backend**, designed with a luxury, modern sage green (`#5B7147`) and cream (`#FAF8F4`) palette.
 
-> **100% Local & Private**: All document operations run directly in your browser using WebAssembly and memory buffers. No files are uploaded to external servers or cloud services.
-
----
-
-## 🚀 Features Implemented
-
-### 1. Multi-PDF Merger (`merge-pdf.js`)
-- **No Limit on File Count**: Merge 2, 5, 20, or 100+ PDF documents simultaneously.
-- **Drag & Reorder Sequence**: Move files up or down to configure the exact merge order before generation.
-- **Real-Time Progress Tracking**: Step-by-step progress percentage as pages are assembled.
-- **Customizable Output Name**: Specify your preferred merged file name.
-- **One-Click Download**: Instant download with celebratory confetti.
-
-### 2. PDF Splitter (`split-pdf.js`)
-- **Custom Page Ranges**: Split by exact ranges (e.g., `1-3, 4-6, 7`).
-- **Fixed Page Chunks**: Automatically slice large documents into chunks of *N* pages (e.g., every 1 page or every 5 pages).
-- **Dual Export Modes**:
-  - Download all split segments bundled into a single `.zip` archive via `JSZip`.
-  - Download individual split parts directly from the results card.
-
-### 3. PDF Compressor (`compress-pdf.js`)
-- **Dual Engine Architecture**:
-  - **In-Browser Engine**: 100% client-side memory compression using binary object streams, orphan object stripping, and structural table optimization (Zero upload needed).
-  - **Local Ghostscript Engine**: Optional integration with local Ghostscript on `localhost:3001` with seamless fallback if backend is offline.
-- **Three Quality Presets**:
-  - *Recommended*: Balanced quality with stream packing.
-  - *Extreme*: Aggressive structural purging and metadata stripping.
-  - *Lossless*: Pure object stream grouping retaining all vector fidelity.
-- **Visual Reduction Metrics**: Shows live before & after file sizes and percentage saved (e.g., `-42% Size Reduction`).
-
-### 3. Navigation & Home Dashboard
-- **Animated Splash Screen**: Boot sequence on startup with memory initialization progress, security check, and smooth fade-out.
-- **Dedicated Navigation Bar**: Separate desktop and mobile tab navigation with active pill transitions:
-  - **Home**: Overview command center with quick launch cards and batch upload zone.
-  - **Merge PDFs**: Dedicated sequential merging workspace with up/down ordering.
-  - **Split PDF**: Dedicated range and fixed-chunk splitting workspace with individual & ZIP downloads.
-- **Home Command Center**: Interactive tool catalog showing active tools (`Phase 1` and `Phase 2`) alongside previews of upcoming modules (`Phase 3` & `Phase 5`).
-
-### 4. File Security & Validation Pipeline
-- **Magic Bytes Verification**: Inspects leading file header bytes (`%PDF-`) to reject fake or corrupt files.
-- **200MB Size Limit**: Guards against memory overflow with friendly warnings.
-- **Encryption & Password Detection**: Detects password-locked files and shows security badges.
-- **Page Counting & Metadata**: Displays file size and total page counts automatically.
-
-### 5. Modern Glassmorphic Dark UI & 3D Visuals
-- **Interactive Three.js 3D Background**: Floating crystalline polyhedron wireframe and particle constellation that gently drifts and responds to mouse parallax.
-- **Framer Motion**: Smooth enter/exit transitions, layout animations for reordering cards, and dynamic progress bar.
-- **Fully Responsive**: Optimized for mobile phones, tablets, laptops, and ultra-wide displays.
+> **100% Local & Private**: All document operations run directly in your browser using WebAssembly, HTML5 Canvas, and memory buffers. No files are uploaded to external servers or cloud services.
 
 ---
 
-## 🏛️ Architecture: Adapter Registry Pattern
+## 🚀 Complete Feature Suite
 
-Tools are modularized using the **Adapter Registry Pattern**. The UI does not contain tool-specific logic; instead, it reads from `client/src/registry/registry.js`.
-
-### Adapter Specification
-Each operation is a self-contained module in `src/registry/adapters/`:
-```javascript
-export default {
-  id: 'tool-id',
-  name: 'Tool Name',
-  description: 'What this tool does...',
-  badge: 'Phase Tag',
-  accepts: (files) => ({ valid: Boolean, reason?: String }),
-  options: [
-    { id: 'optName', label: 'Option Label', type: 'text' | 'select' | 'number', default: '...' }
-  ],
-  execute: async (files, options, onProgress) => {
-    // pdf-lib execution logic
-    return { downloadUrl, filename, ... };
-  }
-};
-```
+### 📦 Essential PDF Productivity Tools
+1. **Multi-PDF Merger (`merge-pdf.js`)**
+   - Unlimited file count: merge 2, 10, or 100+ documents in memory.
+   - Interactive reordering of documents before concatenation.
+   - Live progress indicator with celebratory confetti upon completion.
+2. **PDF Splitter (`split-pdf.js`)**
+   - Custom range extraction (e.g. `1-3, 5, 8-10`).
+   - Fixed chunk slicing (every *N* pages).
+   - Instant multi-file downloads and `.zip` archive packaging via `JSZip`.
+3. **PDF Compressor (`compress-pdf.js` & `pdf-compressor-engine.js`)**
+   - 4 Compression Tiers: **Balanced**, **Extreme**, **Light**, and **Custom**.
+   - Client-side Canvas image downsampling, JPEG re-encoding, and object stream packing.
+   - Live before/after size reduction metrics and negative compression prevention.
 
 ---
 
-## 📂 Project Structure
-
-```text
-ILoveMyOfficeWorks/
-├── README.md                    # Project documentation & roadmap
-├── package.json                 # Monorepo root script runner (concurrently)
-├── client/                      # React (Vite) Frontend
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ThreeCanvas.jsx  # Interactive Three.js 3D background
-│   │   │   ├── Uploader.jsx     # Drag-and-drop zone (react-dropzone)
-│   │   │   ├── FileCard.jsx     # Document card with page count & reorder
-│   │   │   └── OperationBar.jsx # Dynamic adapter executor & options panel
-│   │   ├── registry/
-│   │   │   ├── registry.js      # Central tool registry
-│   │   │   └── adapters/
-│   │   │       ├── merge-pdf.js # Unlimited PDF merger
-│   │   │       └── split-pdf.js # Range & chunk PDF splitter
-│   │   └── utils/
-│   │       └── pdf-magic.js     # Magic byte validator & page counter
-└── server/                      # Lightweight Node.js Backend (Phase 5)
-    ├── package.json
-    └── server.js
-```
+### 📥 CONVERT TO PDF Suite
+1. **JPG to PDF (`jpg-to-pdf.js`)**
+   - Convert JPG, PNG, and WebP images into a clean PDF document.
+   - Configurable orientation (Auto, Portrait, Landscape), page sizes (A4, Letter, Fit to Image), and margins.
+2. **WORD to PDF (`word-to-pdf.js`)**
+   - Convert Microsoft Word documents (`.docx`) into vector PDF documents.
+   - Extracts XML text runs, paragraphs, and heading hierarchies directly in the browser.
+3. **POWERPOINT to PDF (`powerpoint-to-pdf.js`)**
+   - Convert PowerPoint presentation decks (`.pptx`) into landscape PDF slides.
+4. **EXCEL to PDF (`excel-to-pdf.js`)**
+   - Convert Excel spreadsheets and CSV tables into formatted vector PDF tables with gridlines.
+5. **HTML to PDF (`html-to-pdf.js`)**
+   - Convert HTML documents, webpages, and code into clean, printable vector PDF documents.
 
 ---
 
-## 🛠️ Getting Started
+### 📤 CONVERT FROM PDF Suite
+1. **PDF to JPG (`pdf-to-jpg.js`)**
+   - Render PDF pages into high-resolution JPG or PNG images (72 DPI, 150 DPI, 300 DPI).
+   - Package all pages into a `.zip` archive or download individually.
+2. **PDF to WORD (`pdf-to-docx.js` & `pdf-to-docx-engine.js`)**
+   - Convert PDFs into fully editable Microsoft Word (`.docx`) documents with typography and headings.
+   - Supports Flowable editable paragraphs or Scanned page visual fallback.
+3. **PDF to POWERPOINT (`pdf-to-powerpoint.js`)**
+   - Convert PDF document pages into formatted PowerPoint presentation slides (`.pptx`).
+4. **PDF to EXCEL (`pdf-to-excel.js`)**
+   - Extract tables, rows, invoices, and numbers from PDF into Excel CSV format.
+5. **PDF to PDF/A (`pdf-to-pdfa.js`)**
+   - Convert PDF to ISO 19005 compliant archival PDF/A format with DeviceRGB color profiles and standardized XMP metadata.
 
-### 1. Install Dependencies
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Component | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | React 18, Vite | Instant hot module replacement, optimized production bundle |
+| **Styles & Design** | Tailwind CSS, Plus Jakarta Sans, JetBrains Mono | Luxury Sage design system, glassmorphism, zero-wrap navbar |
+| **Motion** | Framer Motion, canvas-confetti | Smooth layout transitions, active tab sliding indicators |
+| **3D Background** | Three.js | Ambient interactive particle web background |
+| **Document Engines** | `pdf-lib`, `pdfjs-dist`, `docx`, `jszip` | 100% in-browser manipulation, zero external network requests |
+
+---
+
+## 💻 Developer Quick Start
+
 ```bash
-npm run install:all
-```
+# Install dependencies
+npm install
 
-### 2. Start Development Server
-```bash
-# Starts both frontend (port 5173) and backend (port 3001)
+# Start development server (Client on 5173, optional server on 3001)
 npm run dev
 
-# Or run frontend only:
-npm run dev:client
+# Build client for production
+npm run build --prefix client
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
----
-
-## 🗺️ Roadmap & Phases
-
-- [x] **Phase 1: Foundation + First Tool**
-  - [x] Drag & drop uploader with magic byte validation
-  - [x] FileCard with page count, file size, and encryption detection
-  - [x] Adapter Registry architecture
-  - [x] Unlimited PDF Merger (`merge-pdf.js`)
-  - [x] Modern 3D Canvas (Three.js) & animations (Framer Motion)
-- [ ] **Phase 2: Page Operations**
-  - [x] Split PDF by range & every N pages (`split-pdf.js`)
-  - [ ] Remove pages
-  - [ ] Extract pages
-  - [ ] Rotate pages
-  - [ ] Reorder pages with thumbnail preview
-- [ ] **Phase 3: Annotations & Marks**
-  - [ ] Add watermark (text/image)
-  - [ ] Page numbering & header/footer
-  - [ ] Insert blank page
-- [ ] **Phase 4: Preview & Multi-file Queue**
-  - [ ] Page thumbnails & PDF canvas preview
-  - [ ] Multi-file batch processing
-- [ ] **Phase 5: Local Node Backend**
-  - [ ] Ghostscript compression
-  - [ ] PDF to JPG / JPG to PDF
-  - [ ] Password protect / unlock (qpdf)
+For AI agent guidelines and architecture deep-dives, see:
+- [AGENTS.md](file:///d:/ILoveMyOfficeWorks/AGENTS.md)
+- [docs/project-knowledge/README.md](file:///d:/ILoveMyOfficeWorks/docs/project-knowledge/README.md)

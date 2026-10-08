@@ -96,9 +96,60 @@ The **Master Pipeline** implements:
 
 ---
 
-## 5. Security & Password Detection (`pdf-magic.js`)
+## 5. Convert to PDF Suite
+
+### A. JPG to PDF (`jpg-to-pdf.js`)
+- **Supported Formats**: JPG, JPEG, PNG, WebP, BMP, GIF.
+- **Engine**: `pdf-lib` + Canvas bitmap re-encoding.
+- **Features**: Auto/Portrait/Landscape orientation, A4/Letter/Fit to Image dimensions, configurable margins (None, Small, Large).
+
+### B. WORD to PDF (`word-to-pdf.js`)
+- **Engine**: In-browser XML extraction via `JSZip` (`word/document.xml`) + `pdf-lib` vector typesetting.
+- **Features**: Auto-detects heading styles (`Heading 1`, `Heading 2`, Title) and body paragraphs.
+
+### C. POWERPOINT to PDF (`powerpoint-to-pdf.js`)
+- **Engine**: `JSZip` XML extraction (`ppt/slides/slide*.xml`) + `pdf-lib` landscape slide renderer.
+- **Features**: Widescreen 16:9 and Standard 4:3 slide geometry, typography hierarchy, slide numbers.
+
+### D. EXCEL to PDF (`excel-to-pdf.js`)
+- **Engine**: CSV/Spreadsheet parser + `pdf-lib` table renderer.
+- **Features**: Automatic cell width calculation, table gridlines, landscape multi-column presentation.
+
+### E. HTML to PDF (`html-to-pdf.js`)
+- **Engine**: DOMParser + `pdf-lib` vector typesetting.
+- **Features**: Renders headings (`H1`-`H6`), paragraphs, and formatted text blocks with automatic page overflow handling.
+
+---
+
+## 6. Convert from PDF Suite
+
+### A. PDF to JPG (`pdf-to-jpg.js`)
+- **Engine**: `pdfjs-dist` Canvas rendering + `JSZip`.
+- **Features**: 72 DPI, 150 DPI, 300 DPI resolution presets; JPG or PNG output; single ZIP packaging for multi-page documents.
+
+### B. PDF to WORD (`pdf-to-docx.js` & `pdf-to-docx-engine.js`)
+- **Engine**: `pdfjs-dist` text item coordinate extraction + `docx` OpenXML serialization.
+- **Features**: Flowable editable paragraphs, heading auto-detection, layout preservation.
+
+### C. PDF to POWERPOINT (`pdf-to-powerpoint.js`)
+- **Engine**: `pdfjs-dist` high-res page rendering + `JSZip` OpenXML `.pptx` assembly.
+- **Features**: Generates valid Microsoft PowerPoint `.pptx` presentation decks with slide relationships.
+
+### D. PDF to EXCEL (`pdf-to-excel.js`)
+- **Engine**: `pdfjs-dist` bounding box coordinate extraction + geometric row/column grouping.
+- **Features**: Groups items by Y-tolerance into rows and X-distance into columns; outputs UTF-8 BOM CSV.
+
+### E. PDF to PDF/A (`pdf-to-pdfa.js`)
+- **Engine**: `pdf-lib` metadata flate streams.
+- **Features**: ISO 19005-1 (PDF/A-1b) conformance; DeviceRGB color profile definitions; XMP metadata schema embedding.
+
+---
+
+## 7. Security & Password Detection (`pdf-magic.js`)
 
 - **File**: [`client/src/utils/pdf-magic.js`](file:///d:/ILoveMyOfficeWorks/client/src/utils/pdf-magic.js)
 - Inspects uploaded files using header bytes (`%PDF-`) and attempts a fast partial load.
 - Detects whether a PDF has owner or user passwords (`isEncrypted`).
-- Rejects corrupt or invalid non-PDF binaries before they enter the processing pipeline.
+- Handles images (JPG, PNG, WebP) and Office documents (.docx, .pptx, .xlsx, .html).
+- Rejects corrupt or invalid binaries before they enter the processing pipeline.
+

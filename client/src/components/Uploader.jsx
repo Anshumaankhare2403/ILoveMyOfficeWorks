@@ -16,7 +16,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
       if (firstRejection.file.size > MAX_FILE_SIZE) {
         setErrorNotice('One or more files exceed the 200MB size limit.');
       } else {
-        setErrorNotice('Only PDF documents are allowed.');
+        setErrorNotice('Unsupported file format. Please upload PDF, images, or Office documents.');
       }
       return;
     }
@@ -54,6 +54,13 @@ export default function Uploader({ onFilesAdded, compact = false }) {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
+      'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+      'text/html': ['.html', '.htm'],
+      'text/csv': ['.csv'],
+      'text/plain': ['.txt'],
     },
     maxSize: MAX_FILE_SIZE,
     multiple: true,
@@ -76,7 +83,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
           <Plus className="w-5 h-5 text-[#5B7147]" />
         )}
         <span className="text-sm font-semibold">
-          {isProcessing ? 'Inspecting PDF files...' : 'Add more PDF files (no limit)'}
+          {isProcessing ? 'Inspecting files...' : 'Add more files (PDF, images, documents)'}
         </span>
       </div>
     );
@@ -110,7 +117,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
 
           <div>
             <h3 className="text-lg sm:text-xl font-bold text-[#262D20] tracking-tight">
-              {isDragActive ? 'Drop your PDF files here' : 'Drop your PDF documents here'}
+              {isDragActive ? 'Drop your files here' : 'Drop your documents or images here'}
             </h3>
             <p className="text-xs sm:text-sm text-[#616D54] mt-1.5">
               or click to browse from your computer • Unlimited files supported
@@ -119,7 +126,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
 
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
             <span className="bg-[#FAF8F4] border border-[#DDD3C2] text-[#4E5941] px-3 py-1 rounded-full font-mono font-medium">
-              .PDF
+              PDF • JPG • PNG • DOCX
             </span>
             <span className="text-[#BDC8B3]">•</span>
             <span className="text-[#6B785E]">Max 200MB per file</span>
