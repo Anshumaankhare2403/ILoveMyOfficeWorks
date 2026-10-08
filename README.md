@@ -6,53 +6,49 @@ A personal, private, client-first PDF and document conversion suite built with *
 
 ---
 
-## 🚀 Complete Feature Suite
+## 🚀 Complete Feature Suite (29 Tools Across 6 Categories)
 
-### 📦 Essential PDF Productivity Tools
-1. **Multi-PDF Merger (`merge-pdf.js`)**
-   - Unlimited file count: merge 2, 10, or 100+ documents in memory.
-   - Interactive reordering of documents before concatenation.
-   - Live progress indicator with celebratory confetti upon completion.
-2. **PDF Splitter (`split-pdf.js`)**
-   - Custom range extraction (e.g. `1-3, 5, 8-10`).
-   - Fixed chunk slicing (every *N* pages).
-   - Instant multi-file downloads and `.zip` archive packaging via `JSZip`.
-3. **PDF Compressor (`compress-pdf.js` & `pdf-compressor-engine.js`)**
-   - 4 Compression Tiers: **Balanced**, **Extreme**, **Light**, and **Custom**.
-   - Client-side Canvas image downsampling, JPEG re-encoding, and object stream packing.
-   - Live before/after size reduction metrics and negative compression prevention.
+### 1. 🗂️ ORGANIZE PDF
+1. **Merge PDF (`merge-pdf.js`)**: Combine unlimited PDF documents sequentially with custom page ordering.
+2. **Split PDF (`split-pdf.js`)**: Custom range extraction (`1-3, 5, 8-10`) or fixed chunk slicing (every *N* pages).
+3. **Remove pages (`remove-pages.js`)**: Delete unwanted, duplicate, or blank pages from your PDF document.
+4. **Extract pages (`extract-pages.js`)**: Select specific page ranges and extract them into a brand-new PDF.
+5. **Organize PDF (`organize-pdf.js`)**: Reorder, reverse, rearrange, or duplicate pages into a custom sequence.
+6. **Scan to PDF (`scan-to-pdf.js`)**: Convert camera photos and document scans into high-contrast clean PDF files.
 
----
+### 2. ⚡ OPTIMIZE PDF
+1. **Compress PDF (`compress-pdf.js`)**: 4 compression tiers (Balanced, Extreme, Light, Custom) with canvas downsampling.
+2. **Repair PDF (`repair-pdf.js`)**: Analyze corrupted, unreadable PDF structures and rebuild intact object streams.
+3. **OCR PDF (`ocr-pdf.js`)**: Recognize scanned text into a searchable PDF overlay and text transcript export.
 
-### 📥 CONVERT TO PDF Suite
-1. **JPG to PDF (`jpg-to-pdf.js`)**
-   - Convert JPG, PNG, and WebP images into a clean PDF document.
-   - Configurable orientation (Auto, Portrait, Landscape), page sizes (A4, Letter, Fit to Image), and margins.
-2. **WORD to PDF (`word-to-pdf.js`)**
-   - Convert Microsoft Word documents (`.docx`) into vector PDF documents.
-   - Extracts XML text runs, paragraphs, and heading hierarchies directly in the browser.
-3. **POWERPOINT to PDF (`powerpoint-to-pdf.js`)**
-   - Convert PowerPoint presentation decks (`.pptx`) into landscape PDF slides.
-4. **EXCEL to PDF (`excel-to-pdf.js`)**
-   - Convert Excel spreadsheets and CSV tables into formatted vector PDF tables with gridlines.
-5. **HTML to PDF (`html-to-pdf.js`)**
-   - Convert HTML documents, webpages, and code into clean, printable vector PDF documents.
+### 3. 📥 CONVERT TO PDF
+1. **JPG to PDF (`jpg-to-pdf.js`)**: Convert JPG, PNG, and WebP images into a clean PDF document.
+2. **WORD to PDF (`word-to-pdf.js`)**: Convert Microsoft Word documents (`.docx`) into vector PDF documents.
+3. **POWERPOINT to PDF (`powerpoint-to-pdf.js`)**: Convert PowerPoint presentation decks (`.pptx`) into landscape PDF slides.
+4. **EXCEL to PDF (`excel-to-pdf.js`)**: Convert Excel spreadsheets and CSV tables into formatted vector PDF tables.
+5. **HTML to PDF (`html-to-pdf.js`)**: Convert HTML documents, webpages, and code into clean vector PDF documents.
 
----
+### 4. 📤 CONVERT FROM PDF
+1. **PDF to JPG (`pdf-to-jpg.js`)**: Render PDF pages into high-resolution JPG or PNG images and ZIP archive.
+2. **PDF to WORD (`pdf-to-docx.js`)**: Convert PDFs into fully editable Microsoft Word (`.docx`) files with typography.
+3. **PDF to POWERPOINT (`pdf-to-powerpoint.js`)**: Convert PDF document pages into formatted PowerPoint presentation slides (`.pptx`).
+4. **PDF to EXCEL (`pdf-to-excel.js`)**: Extract tables, rows, invoices, and numbers from PDF into Excel CSV format.
+5. **PDF to PDF/A (`pdf-to-pdfa.js`)**: Convert PDF to ISO 19005 compliant archival PDF/A format with color profiles.
 
-### 📤 CONVERT FROM PDF Suite
-1. **PDF to JPG (`pdf-to-jpg.js`)**
-   - Render PDF pages into high-resolution JPG or PNG images (72 DPI, 150 DPI, 300 DPI).
-   - Package all pages into a `.zip` archive or download individually.
-2. **PDF to WORD (`pdf-to-docx.js` & `pdf-to-docx-engine.js`)**
-   - Convert PDFs into fully editable Microsoft Word (`.docx`) documents with typography and headings.
-   - Supports Flowable editable paragraphs or Scanned page visual fallback.
-3. **PDF to POWERPOINT (`pdf-to-powerpoint.js`)**
-   - Convert PDF document pages into formatted PowerPoint presentation slides (`.pptx`).
-4. **PDF to EXCEL (`pdf-to-excel.js`)**
-   - Extract tables, rows, invoices, and numbers from PDF into Excel CSV format.
-5. **PDF to PDF/A (`pdf-to-pdfa.js`)**
-   - Convert PDF to ISO 19005 compliant archival PDF/A format with DeviceRGB color profiles and standardized XMP metadata.
+### 5. ✍️ EDIT PDF
+1. **Rotate PDF (`rotate-pdf.js`)**: Rotate all or specific pages clockwise by 90°, 180°, or 270°.
+2. **Add page numbers (`add-page-numbers.js`)**: Insert customizable page numbering, headers, and footers.
+3. **Add watermark (`add-watermark.js`)**: Stamp custom text or security watermarks with angle and opacity control.
+4. **Crop PDF (`crop-pdf.js`)**: Trim margins, crop page dimensions, and remove white borders.
+5. **Edit PDF (`edit-pdf.js`)**: Add custom text annotations, headers, stamps, and notes directly onto pages.
+6. **PDF Forms (`pdf-forms.js`)**: Flatten interactive form fields into static vector elements or lock inputs to read-only.
+
+### 6. 🛡️ PDF SECURITY
+1. **Unlock PDF (`unlock-pdf.js`)**: Remove password protection and unlock printing and copying permissions.
+2. **Protect PDF (`protect-pdf.js`)**: Encrypt PDF with AES password protection to prevent unauthorized opening or editing.
+3. **Sign PDF (`sign-pdf.js`)**: Apply an electronic signature badge, verified signing certificate block, and date.
+4. **Redact PDF (`redact-pdf.js`)**: Permanently blackout sensitive information, confidential phrases, or page areas.
+5. **Compare PDF (`compare-pdf.js`)**: Compare two PDF documents side-by-side with an audit diff report.
 
 ---
 

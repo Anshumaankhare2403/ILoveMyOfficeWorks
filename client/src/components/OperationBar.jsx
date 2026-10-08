@@ -18,6 +18,23 @@ import {
   Presentation,
   Globe,
   ChevronDown,
+  Trash2,
+  FileDown,
+  ArrowUpDown,
+  Camera,
+  Wrench,
+  FileSearch,
+  RotateCw,
+  Hash,
+  Stamp,
+  Crop,
+  PenTool,
+  FileSpreadsheet,
+  Unlock,
+  Shield,
+  CheckSquare,
+  EyeOff,
+  GitCompare,
 } from 'lucide-react';
 import { getRegisteredAdapters, executeAdapter } from '../registry/registry';
 import { formatFileSize } from '../utils/pdf-magic';
@@ -147,26 +164,62 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
 
   const getAdapterIcon = (id) => {
     switch (id) {
+      case 'merge-pdf':
+        return <Layers className="w-4 h-4" />;
       case 'split-pdf':
         return <Scissors className="w-4 h-4" />;
+      case 'remove-pages':
+        return <Trash2 className="w-4 h-4" />;
+      case 'extract-pages':
+        return <FileDown className="w-4 h-4" />;
+      case 'organize-pdf':
+        return <ArrowUpDown className="w-4 h-4" />;
+      case 'scan-to-pdf':
+        return <Camera className="w-4 h-4" />;
       case 'compress-pdf':
         return <Minimize2 className="w-4 h-4" />;
-      case 'pdf-to-docx':
-      case 'word-to-pdf':
-        return <FileText className="w-4 h-4" />;
+      case 'repair-pdf':
+        return <Wrench className="w-4 h-4" />;
+      case 'ocr-pdf':
+        return <FileSearch className="w-4 h-4" />;
       case 'jpg-to-pdf':
       case 'pdf-to-jpg':
         return <Image className="w-4 h-4" />;
-      case 'excel-to-pdf':
-      case 'pdf-to-excel':
-        return <Table className="w-4 h-4" />;
+      case 'word-to-pdf':
+      case 'pdf-to-docx':
+        return <FileText className="w-4 h-4" />;
       case 'powerpoint-to-pdf':
       case 'pdf-to-powerpoint':
         return <Presentation className="w-4 h-4" />;
-      case 'pdf-to-pdfa':
-        return <Archive className="w-4 h-4" />;
+      case 'excel-to-pdf':
+      case 'pdf-to-excel':
+        return <Table className="w-4 h-4" />;
       case 'html-to-pdf':
         return <Globe className="w-4 h-4" />;
+      case 'pdf-to-pdfa':
+        return <Archive className="w-4 h-4" />;
+      case 'rotate-pdf':
+        return <RotateCw className="w-4 h-4" />;
+      case 'add-page-numbers':
+        return <Hash className="w-4 h-4" />;
+      case 'add-watermark':
+        return <Stamp className="w-4 h-4" />;
+      case 'crop-pdf':
+        return <Crop className="w-4 h-4" />;
+      case 'edit-pdf':
+        return <PenTool className="w-4 h-4" />;
+      case 'pdf-forms':
+        return <FileSpreadsheet className="w-4 h-4" />;
+      case 'unlock-pdf':
+        return <Unlock className="w-4 h-4" />;
+      case 'protect-pdf':
+        return <Shield className="w-4 h-4" />;
+      case 'sign-pdf':
+        return <CheckSquare className="w-4 h-4" />;
+      case 'redact-pdf':
+        return <EyeOff className="w-4 h-4" />;
+      case 'compare-pdf':
+        return <GitCompare className="w-4 h-4" />;
       default:
         return <Layers className="w-4 h-4" />;
     }

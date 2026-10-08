@@ -119,6 +119,49 @@ app.post('/api/compress', upload.single('file'), async (req, res) => {
   }
 });
 
+/**
+ * Encrypt PDF endpoint via Ghostscript
+ */
+app.post('/api/protect', upload.single('file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No PDF file uploaded.' });
+  }
+
+  const inputPath = req.file.path;
+  const outputPath = path.join(tempDir, `protected_${Date.now()}_${req.file.originalname}`);
+  const password = req.body.password || '123456';
+  const gsCmd = await getGhostscriptCmd();
+
+  if (!gsCmd) {
+    if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+    return res.status(503).json({
+      error: 'Ghostscript is not installed on the host machine.',
+      fallbackAvailable: true,
+    });
+  }
+
+  try {
+    const cmd = `${gsCmd} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -sOwnerPassword="${password}" -sUserPassword="${password}" -dPermissions=-4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outputPath}" "${inputPath}"`;
+    await execAsync(cmd);
+
+    if (!fs.existsSync(outputPath)) {
+      throw new Error('Ghostscript did not produce protected file.');
+    }
+
+    const protectedBuffer = fs.readFileSync(outputPath);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="protected_${req.file.originalname}"`);
+    res.send(protectedBuffer);
+  } catch (err) {
+    res.status(500).json({ error: `Encryption failed: ${err.message}` });
+  } finally {
+    try {
+      if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+      if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+    } catch {}
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`[ILoveMyOfficeWorks Server] Running on http://localhost:${PORT}`);
 });
