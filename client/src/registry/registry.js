@@ -40,6 +40,12 @@ import signPdfAdapter from './adapters/sign-pdf';
 import redactPdfAdapter from './adapters/redact-pdf';
 import comparePdfAdapter from './adapters/compare-pdf';
 
+// 7. Image Tools
+import compressImageAdapter from './adapters/compress-image';
+import resizeImageAdapter from './adapters/resize-image';
+import cropImageAdapter from './adapters/crop-image';
+import convertToJpgAdapter from './adapters/convert-to-jpg';
+
 /**
  * Adapter Registry
  * All operations are registered here. Adding a new tool only requires
@@ -87,6 +93,12 @@ export const ADAPTER_REGISTRY = [
   signPdfAdapter,
   redactPdfAdapter,
   comparePdfAdapter,
+
+  // 7. Image Tools
+  compressImageAdapter,
+  resizeImageAdapter,
+  cropImageAdapter,
+  convertToJpgAdapter,
 ];
 
 /**

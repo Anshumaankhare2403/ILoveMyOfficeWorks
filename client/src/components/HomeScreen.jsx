@@ -35,6 +35,7 @@ import {
   EyeOff,
   GitCompare,
   Search,
+  Maximize2,
 } from 'lucide-react';
 import Uploader from './Uploader';
 
@@ -380,6 +381,53 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
         },
       ],
     },
+    {
+      id: 'image',
+      title: 'IMAGE TOOLS',
+      desc: 'Compress, resize, crop and convert photos',
+      icon: Image,
+      color: 'text-teal-700 bg-teal-500/10 border-teal-300/40',
+      headerBg: 'from-teal-50 to-emerald-50/50 border-teal-200/60',
+      accentColor: '#0D9488',
+      tools: [
+        {
+          id: 'compress-image',
+          name: 'Compress Image',
+          desc: 'Shrink JPG, PNG, and WebP images with smart Canvas re-encoding and quality downsampling.',
+          badge: 'Optimize',
+          icon: Minimize2,
+          iconColor: 'bg-teal-500/10 text-teal-600 border-teal-200/50',
+          count: fileCounts['compress-image'] || 0,
+        },
+        {
+          id: 'resize-image',
+          name: 'Resize Image',
+          desc: 'Change image dimensions by percentage scale or exact pixel width and height.',
+          badge: 'Resize',
+          icon: Maximize2,
+          iconColor: 'bg-sky-500/10 text-sky-600 border-sky-200/50',
+          count: fileCounts['resize-image'] || 0,
+        },
+        {
+          id: 'crop-image',
+          name: 'Crop Image',
+          desc: 'Crop photos and images with preset aspect ratios or custom pixel bounding boxes.',
+          badge: 'Crop',
+          icon: Crop,
+          iconColor: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/50',
+          count: fileCounts['crop-image'] || 0,
+        },
+        {
+          id: 'convert-to-jpg',
+          name: 'Convert to JPG',
+          desc: 'Convert PNG, WebP, GIF, SVG, or BMP images into clean standard JPEG files.',
+          badge: 'Convert',
+          icon: Image,
+          iconColor: 'bg-amber-500/10 text-amber-600 border-amber-200/50',
+          count: fileCounts['convert-to-jpg'] || 0,
+        },
+      ],
+    },
   ];
 
   // Featured 4 core tools
@@ -453,7 +501,7 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5B7147]/10 border border-[#5B7147]/25 text-[#435433] text-xs font-bold uppercase tracking-wider"
         >
           <Sparkles className="w-3.5 h-3.5 text-[#5B7147]" />
-          <span>Local PDF Productivity Engine • 29 Complete Tools</span>
+          <span>Local PDF & Image Engine • 33 Complete Tools</span>
         </motion.div>
 
         <motion.h2
@@ -576,7 +624,7 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search all 29 tools..."
+            placeholder="Search all 33 tools..."
             className="w-full bg-white border border-[#DDD3C2] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#1E2619] placeholder-[#8B987E] focus:outline-none focus:border-[#5B7147] focus:ring-1 focus:ring-[#5B7147] transition-all"
           />
           {searchQuery && (
@@ -591,8 +639,8 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
         </div>
       </div>
 
-      {/* 6-Category Grid Layout Matching User Screenshot */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* Category Grid Layout Matching User Suites */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-4">
         {filteredCategories.map((category) => {
           const CategoryIcon = category.icon;
 

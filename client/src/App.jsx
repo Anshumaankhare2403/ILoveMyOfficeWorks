@@ -30,6 +30,7 @@ import {
   Camera,
   Wrench,
   FileSearch,
+  Maximize2,
 } from 'lucide-react';
 import ThreeCanvas from './components/ThreeCanvas';
 import SplashScreen from './components/SplashScreen';
@@ -118,6 +119,12 @@ const TOOL_CONFIGS = {
   'sign-pdf': { id: 'sign-pdf', name: 'Sign PDF', icon: CheckSquare, badge: 'Security', desc: 'Apply an electronic signature badge, verified signing certificate block, and date onto your PDF', hint: 'Upload a PDF document to add a verified signature block.' },
   'redact-pdf': { id: 'redact-pdf', name: 'Redact PDF', icon: EyeOff, badge: 'Security', desc: 'Permanently blackout sensitive information, confidential phrases, or page areas to prevent inspection', hint: 'Upload a PDF document to redact confidential data.' },
   'compare-pdf': { id: 'compare-pdf', name: 'Compare PDF', icon: GitCompare, badge: 'Security', desc: 'Compare two PDF documents side-by-side, analyze text and page differences, and generate audit report', hint: 'Upload 2 PDF documents to compare differences.' },
+
+  // 7. Image Tools
+  'compress-image': { id: 'compress-image', name: 'Compress Image', icon: Minimize2, badge: 'Image', desc: 'Shrink image file size with smart Canvas re-encoding and quality downsampling', hint: 'Upload 1 or more images (JPG, PNG, WebP) to compress.' },
+  'resize-image': { id: 'resize-image', name: 'Resize Image', icon: Maximize2, badge: 'Image', desc: 'Change image dimensions by percentage scale or exact pixel width and height', hint: 'Upload 1 or more images to resize.' },
+  'crop-image': { id: 'crop-image', name: 'Crop Image', icon: Crop, badge: 'Image', desc: 'Crop photos and images with preset aspect ratios or custom pixel bounding boxes', hint: 'Upload 1 or more images to crop.' },
+  'convert-to-jpg': { id: 'convert-to-jpg', name: 'Convert to JPG', icon: Image, badge: 'Image', desc: 'Convert PNG, WebP, GIF, SVG, or BMP images into clean standard JPEG files', hint: 'Upload images (PNG, WebP, GIF) to convert to standard JPG format.' },
 };
 
 function MainApp() {
@@ -216,6 +223,10 @@ function MainApp() {
     'sign-pdf': pdfCount,
     'redact-pdf': pdfCount,
     'compare-pdf': pdfCount,
+    'compress-image': imageCount,
+    'resize-image': imageCount,
+    'crop-image': imageCount,
+    'convert-to-jpg': imageCount,
   };
 
   return (

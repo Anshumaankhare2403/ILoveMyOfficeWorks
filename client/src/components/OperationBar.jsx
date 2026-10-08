@@ -35,6 +35,7 @@ import {
   CheckSquare,
   EyeOff,
   GitCompare,
+  Maximize2,
 } from 'lucide-react';
 import { getRegisteredAdapters, executeAdapter } from '../registry/registry';
 import { formatFileSize } from '../utils/pdf-magic';
@@ -220,6 +221,14 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
         return <EyeOff className="w-4 h-4" />;
       case 'compare-pdf':
         return <GitCompare className="w-4 h-4" />;
+      case 'compress-image':
+        return <Minimize2 className="w-4 h-4" />;
+      case 'resize-image':
+        return <Maximize2 className="w-4 h-4" />;
+      case 'crop-image':
+        return <Crop className="w-4 h-4" />;
+      case 'convert-to-jpg':
+        return <Image className="w-4 h-4" />;
       default:
         return <Layers className="w-4 h-4" />;
     }

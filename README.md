@@ -6,7 +6,7 @@ A personal, private, client-first PDF and document conversion suite built with *
 
 ---
 
-## 🚀 Complete Feature Suite (29 Tools Across 6 Categories)
+## 🚀 Complete Feature Suite (33 Tools Across 7 Categories)
 
 ### 1. 🗂️ ORGANIZE PDF
 1. **Merge PDF (`merge-pdf.js`)**: Combine unlimited PDF documents sequentially with custom page ordering.
@@ -49,6 +49,12 @@ A personal, private, client-first PDF and document conversion suite built with *
 3. **Sign PDF (`sign-pdf.js`)**: Apply an electronic signature badge, verified signing certificate block, and date.
 4. **Redact PDF (`redact-pdf.js`)**: Permanently blackout sensitive information, confidential phrases, or page areas.
 5. **Compare PDF (`compare-pdf.js`)**: Compare two PDF documents side-by-side with an audit diff report.
+
+### 7. 🖼️ IMAGE TOOLS
+1. **Compress Image (`compress-image.js`)**: Shrink JPG, PNG, and WebP images with smart Canvas re-encoding and quality downsampling.
+2. **Resize Image (`resize-image.js`)**: Change image dimensions by percentage scale or exact pixel width and height.
+3. **Crop Image (`crop-image.js`)**: Crop photos with preset aspect ratios (1:1, 16:9, 4:3, 9:16) or custom pixel margin boxes.
+4. **Convert to JPG (`convert-to-jpg.js`)**: Convert PNG, WebP, GIF, SVG, or BMP images into clean standard JPEG files.
 
 ---
 

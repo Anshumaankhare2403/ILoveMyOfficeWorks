@@ -1,14 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Home,
   Sparkles,
   ChevronDown,
   Layers,
   Scissors,
   Minimize2,
   FileText,
-  Image,
+  Image as ImageIcon,
   Table,
   Presentation,
   Globe,
@@ -36,10 +35,11 @@ import {
   EyeOff,
   GitCompare,
   Grid,
+  Maximize2,
 } from 'lucide-react';
 
 export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
-  const [openDropdown, setOpenDropdown] = useState(null); // 'organize' | 'optimize' | 'convert' | 'edit' | 'security' | 'allTools' | null
+  const [openDropdown, setOpenDropdown] = useState(null); // 'organize' | 'optimize' | 'convert' | 'edit' | 'security' | 'image' | 'allTools' | null
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSectionOpen, setMobileSectionOpen] = useState('organize');
   const closeTimerRef = useRef(null);
@@ -169,7 +169,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
       name: 'JPG to PDF',
       desc: 'Convert JPG, PNG, WebP images into PDF',
       badge: 'Images',
-      icon: Image,
+      icon: ImageIcon,
       iconColor: 'text-amber-600 bg-amber-50 border-amber-200/60',
       count: fileCounts['jpg-to-pdf'] || 0,
     },
@@ -218,7 +218,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
       name: 'PDF to JPG',
       desc: 'Convert PDF pages into high-res JPG/PNG images',
       badge: 'Images',
-      icon: Image,
+      icon: ImageIcon,
       iconColor: 'text-amber-600 bg-amber-50 border-amber-200/60',
       count: fileCounts['pdf-to-jpg'] || 0,
     },
@@ -367,7 +367,47 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
     },
   ];
 
-  // Mega-menu columns
+  // 7. Image Tools (from user request)
+  const imageTools = [
+    {
+      id: 'compress-image',
+      name: 'Compress Image',
+      desc: 'Shrink JPG, PNG, and WebP with smart Canvas re-encoding',
+      badge: 'Optimize',
+      icon: Minimize2,
+      iconColor: 'text-teal-600 bg-teal-50 border-teal-200/60',
+      count: fileCounts['compress-image'] || 0,
+    },
+    {
+      id: 'resize-image',
+      name: 'Resize Image',
+      desc: 'Change dimensions by percentage scale or exact pixels',
+      badge: 'Resize',
+      icon: Maximize2,
+      iconColor: 'text-sky-600 bg-sky-50 border-sky-200/60',
+      count: fileCounts['resize-image'] || 0,
+    },
+    {
+      id: 'crop-image',
+      name: 'Crop Image',
+      desc: 'Crop photos with preset aspect ratios (1:1, 16:9, 4:3)',
+      badge: 'Crop',
+      icon: Crop,
+      iconColor: 'text-emerald-600 bg-emerald-50 border-emerald-200/60',
+      count: fileCounts['crop-image'] || 0,
+    },
+    {
+      id: 'convert-to-jpg',
+      name: 'Convert to JPG',
+      desc: 'Convert PNG, WebP, GIF, or SVG images into standard JPEG',
+      badge: 'Convert',
+      icon: ImageIcon,
+      iconColor: 'text-amber-600 bg-amber-50 border-amber-200/60',
+      count: fileCounts['convert-to-jpg'] || 0,
+    },
+  ];
+
+  // Mega-menu columns (7 categories total)
   const megaColumns = [
     { title: 'ORGANIZE PDF', tools: organizeTools, color: 'text-rose-600' },
     { title: 'OPTIMIZE PDF', tools: optimizeTools, color: 'text-emerald-600' },
@@ -375,6 +415,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
     { title: 'CONVERT FROM PDF', tools: convertFromPdfTools, color: 'text-blue-600' },
     { title: 'EDIT PDF', tools: editTools, color: 'text-purple-600' },
     { title: 'PDF SECURITY', tools: securityTools, color: 'text-sky-600' },
+    { title: 'IMAGE TOOLS', tools: imageTools, color: 'text-teal-600' },
   ];
 
   // Mobile accordion sections
@@ -385,6 +426,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
     { id: 'fromPdf', label: 'Convert from PDF', icon: ArrowUpFromLine, tools: convertFromPdfTools },
     { id: 'edit', label: 'Edit PDF', icon: PenTool, tools: editTools },
     { id: 'security', label: 'PDF Security', icon: Shield, tools: securityTools },
+    { id: 'image', label: 'Image Tools', icon: ImageIcon, tools: imageTools },
   ];
 
   const handleSelectTool = (toolId) => {
@@ -414,11 +456,12 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
       className="relative z-50 bg-[#FAF8F4]/98 backdrop-blur-xl border-b border-[#E8E1D5] sticky top-0 transition-all select-none shadow-sm"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
-        {/* Brand & Logo */}
+        {/* Brand & Logo (Clicking returns to Home) */}
         <button
           type="button"
           onClick={() => handleSelectTool('home')}
-          className="flex items-center gap-3 text-left group transition-all shrink-0"
+          className="flex items-center gap-3 text-left group transition-all shrink-0 cursor-pointer"
+          title="Return to Home Dashboard"
         >
           <div className="relative">
             <div className="absolute inset-0 bg-[#5B7147] rounded-xl blur-md opacity-25 group-hover:opacity-45 transition-opacity" />
@@ -432,31 +475,17 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                 ILoveMy<span className="text-[#5B7147]">OfficeWorks</span>
               </span>
               <span className="hidden xl:inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#435433] border border-[#5B7147]/20 whitespace-nowrap">
-                29 Tools
+                33 Tools
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-[#6B795D] font-medium hidden sm:block whitespace-nowrap">
-              Personal PDF Toolkit • 100% Private
+              Personal PDF & Image Toolkit • 100% Private
             </p>
           </div>
         </button>
 
-        {/* Clean Desktop Navigation Bar */}
+        {/* Clean Desktop Navigation Bar (Home removed as requested) */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
-          {/* Home Link */}
-          <button
-            type="button"
-            onClick={() => handleSelectTool('home')}
-            className={`px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'home'
-                ? 'bg-[#5B7147] text-white shadow-sm'
-                : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
-            }`}
-          >
-            <Home className="w-3.5 h-3.5" />
-            <span>Home</span>
-          </button>
-
           {/* 1. Organize Dropdown */}
           <div
             className="relative"
@@ -481,7 +510,6 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
               />
             </button>
 
-            {/* Dropdown Panel (Solid white, zero bleed-through) */}
             <AnimatePresence>
               {openDropdown === 'organize' && (
                 <motion.div
@@ -644,7 +672,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
             </AnimatePresence>
           </div>
 
-          {/* 3. Convert Dropdown (Dual Column: To PDF & From PDF) */}
+          {/* 3. Convert Dropdown */}
           <div
             className="relative"
             onMouseEnter={() => handleMouseEnter('convert')}
@@ -668,7 +696,6 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
               />
             </button>
 
-            {/* Dual Column Convert Panel */}
             <AnimatePresence>
               {openDropdown === 'convert' && (
                 <motion.div
@@ -678,7 +705,6 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                   transition={{ duration: 0.15 }}
                   className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[560px] bg-white rounded-2xl border border-[#DDD3C2] shadow-2xl shadow-stone-900/20 p-4 z-50 grid grid-cols-2 gap-4"
                 >
-                  {/* Column 1: Convert TO PDF */}
                   <div className="space-y-1.5">
                     <div className="pb-2 border-b border-[#F0EAE1] flex items-center justify-between">
                       <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -726,7 +752,6 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                     </div>
                   </div>
 
-                  {/* Column 2: Convert FROM PDF */}
                   <div className="space-y-1.5 pl-3 border-l border-[#F0EAE1]">
                     <div className="pb-2 border-b border-[#F0EAE1] flex items-center justify-between">
                       <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -902,7 +927,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 4, scale: 0.98 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl border border-[#DDD3C2] shadow-2xl shadow-stone-900/20 p-2.5 z-50 space-y-1"
+                  className="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl border border-[#DDD3C2] shadow-2xl shadow-stone-900/20 p-2.5 z-50 space-y-1"
                 >
                   <div className="px-3 py-1.5 border-b border-[#F0EAE1] flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#6B795D] uppercase tracking-wider">
@@ -964,7 +989,101 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
             </AnimatePresence>
           </div>
 
-          {/* 6. All PDF Tools Mega-Menu (Matches User Screenshot Exactly!) */}
+          {/* 6. Image Tools Dropdown (NEW!) */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter('image')}
+          >
+            <button
+              type="button"
+              onClick={() => setOpenDropdown(openDropdown === 'image' ? null : 'image')}
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
+                hasActiveTool(imageTools)
+                  ? 'bg-[#5B7147] text-white shadow-sm'
+                  : openDropdown === 'image'
+                  ? 'bg-white text-[#1E2619] shadow-sm'
+                  : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
+              }`}
+            >
+              <span>Image</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${
+                  openDropdown === 'image' ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            <AnimatePresence>
+              {openDropdown === 'image' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl border border-[#DDD3C2] shadow-2xl shadow-stone-900/20 p-2.5 z-50 space-y-1"
+                >
+                  <div className="px-3 py-1.5 border-b border-[#F0EAE1] flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-teal-700 uppercase tracking-wider flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      <span>IMAGE TOOLS</span>
+                    </span>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 border border-teal-200">
+                      4 Tools
+                    </span>
+                  </div>
+                  <div className="space-y-1 pt-1">
+                    {imageTools.map((tool) => {
+                      const Icon = tool.icon;
+                      const active = isToolActive(tool.id);
+                      return (
+                        <button
+                          key={tool.id}
+                          type="button"
+                          onClick={() => handleSelectTool(tool.id)}
+                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${
+                            active
+                              ? 'bg-[#5B7147] text-white font-bold'
+                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
+                                active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                              }`}
+                            >
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <span className="text-xs font-bold truncate block">{tool.name}</span>
+                              <span
+                                className={`text-[10px] truncate block ${
+                                  active ? 'text-white/80' : 'text-[#78856B]'
+                                }`}
+                              >
+                                {tool.desc}
+                              </span>
+                            </div>
+                          </div>
+                          {tool.count > 0 && (
+                            <span
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${
+                                active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
+                              }`}
+                            >
+                              {tool.count}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* 7. All PDF & Image Tools Mega-Menu */}
           <div
             className="relative"
             onMouseEnter={() => handleMouseEnter('allTools')}
@@ -979,7 +1098,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
               }`}
             >
               <Grid className="w-3.5 h-3.5 text-[#5B7147]" />
-              <span>All PDF Tools</span>
+              <span>All Tools</span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-150 ${
                   openDropdown === 'allTools' ? 'rotate-180' : ''
@@ -987,7 +1106,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
               />
             </button>
 
-            {/* Expansive Full-Width 6-Column Mega Menu */}
+            {/* Expansive Full-Width 7-Column Mega Menu */}
             <AnimatePresence>
               {openDropdown === 'allTools' && (
                 <motion.div
@@ -1001,7 +1120,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-[#5B7147]" />
                       <span className="text-sm font-black text-[#1E2619] tracking-tight uppercase">
-                        All PDF Tools Directory (29 Tools)
+                        All Office & Image Tools Directory (33 Tools)
                       </span>
                     </div>
                     <span className="text-xs text-[#6B795D] font-medium">
@@ -1009,8 +1128,8 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                     </span>
                   </div>
 
-                  {/* 6 Columns matching the user's reference image */}
-                  <div className="grid grid-cols-6 gap-4">
+                  {/* 7 Columns matching all categories */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                     {megaColumns.map((col, idx) => (
                       <div key={idx} className="space-y-2">
                         <h4 className={`text-xs font-black tracking-wider uppercase ${col.color}`}>
@@ -1082,26 +1201,9 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden border-t border-[#E5DDD0] bg-white px-4 py-4 space-y-4 max-h-[80vh] overflow-y-auto"
+            className="lg:hidden border-t border-[#E5DDD0] bg-white px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto"
           >
-            {/* Quick Home */}
-            <button
-              type="button"
-              onClick={() => handleSelectTool('home')}
-              className={`w-full py-2.5 px-3 rounded-xl font-bold text-sm flex items-center justify-between border ${
-                activeTab === 'home'
-                  ? 'bg-[#5B7147] text-white border-[#5B7147]'
-                  : 'bg-white text-[#262D20] border-[#DDD3C2]'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Home className="w-4 h-4" />
-                <span>Home Dashboard</span>
-              </div>
-              <span className="text-xs opacity-75">Overview</span>
-            </button>
-
-            {/* Accordion Sections */}
+            {/* Accordion Sections for Mobile */}
             <div className="space-y-2">
               {mobileSections.map((section) => {
                 const SectionIcon = section.icon;
