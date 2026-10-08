@@ -246,6 +246,7 @@ function MainApp() {
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab)}
         fileCounts={fileCounts}
+        onShowSplash={() => setShowSplash(true)}
       />
 
       {/* Main Content Area */}
@@ -263,6 +264,7 @@ function MainApp() {
                 onSelectTool={(toolId) => setActiveTab(toolId)}
                 onQuickUpload={handleHomeQuickUpload}
                 fileCounts={fileCounts}
+                onShowSplash={() => setShowSplash(true)}
               />
             </motion.div>
           )}

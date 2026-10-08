@@ -38,7 +38,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 
-export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
+export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShowSplash }) {
   const [openDropdown, setOpenDropdown] = useState(null); // 'organize' | 'optimize' | 'convert' | 'edit' | 'security' | 'image' | 'allTools' | null
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSectionOpen, setMobileSectionOpen] = useState('organize');
@@ -1177,17 +1177,23 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
 
         {/* Right Status Badge & Mobile Hamburger Button */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#5B7147]/10 border border-[#5B7147]/20 text-[#3D4D2C]">
+          <button
+            type="button"
+            onClick={onShowSplash}
+            title="View Brand Splash Screen & Privacy Diagnostics"
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#5B7147]/10 hover:bg-[#5B7147]/20 border border-[#5B7147]/20 text-[#3D4D2C] transition-all cursor-pointer group"
+          >
             <span className="w-2 h-2 rounded-full bg-[#5B7147] animate-pulse" />
             <ShieldCheck className="w-3.5 h-3.5 text-[#5B7147]" />
             <span className="text-[11px] font-bold whitespace-nowrap">100% Private</span>
-          </div>
+            <Sparkles className="w-3 h-3 text-[#5B7147] opacity-60 group-hover:opacity-100 group-hover:rotate-12 transition-all ml-0.5" />
+          </button>
 
           {/* Mobile Menu Button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl bg-white border border-[#DDD3C2] text-[#435433] hover:bg-[#FAF8F4] shadow-sm transition-all"
+            className="lg:hidden p-2 rounded-xl bg-white border border-[#DDD3C2] text-[#435433] hover:bg-[#FAF8F4] shadow-sm transition-all cursor-pointer"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -1283,6 +1289,21 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Mobile View Splash Screen Action */}
+            <div className="pt-2 border-t border-[#F0EAE1]">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onShowSplash?.();
+                }}
+                className="w-full py-2.5 px-3 rounded-xl bg-[#5B7147]/10 hover:bg-[#5B7147]/15 text-[#435433] text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#5B7147]" />
+                <span>Replay Brand Welcome & Diagnostics</span>
+              </button>
             </div>
           </motion.div>
         )}
