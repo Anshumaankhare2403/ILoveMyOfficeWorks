@@ -11,7 +11,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Privacy-100%25_Client--Side-5B7147?style=for-the-badge&logo=shield" alt="100% Client-Side" />
-  <img src="https://img.shields.io/badge/Tools-33_Active_Tools-435433?style=for-the-badge&logo=wpexplorer" alt="33 Tools" />
+  <img src="https://img.shields.io/badge/Tools-35_Active_Tools-435433?style=for-the-badge&logo=wpexplorer" alt="35 Tools" />
+  <img src="https://img.shields.io/badge/Desktop-Windows_v2.5.0-5B7147?style=for-the-badge&logo=windows" alt="Windows v2.5.0" />
   <img src="https://img.shields.io/badge/Frontend-React_18_+_Vite_6-61DAFB?style=for-the-badge&logo=react" alt="React 18 + Vite" />
   <img src="https://img.shields.io/badge/Styling-Tailwind_CSS_3.4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Theme-Luxury_Sage-5B7147?style=for-the-badge" alt="Luxury Sage" />
@@ -26,13 +27,15 @@
 - [✨ Key Features](#-key-features)
 - [🛠️ Technology Stack](#️-technology-stack)
 - [🎨 UI \& Design System (Luxury Sage)](#-ui--design-system-luxury-sage)
-- [🗂️ Complete Tool Catalog (33 Tools / 7 Suites)](#️-complete-tool-catalog-33-tools--7-suites)
+- [🗂️ Complete Tool Catalog (35 Tools / 7 Suites)](#️-complete-tool-catalog-35-tools--7-suites)
+- [🖼️ High-Capacity 1,000+ Image Merger Engine](#️-high-capacity-1000-image-merger-engine)
 - [🏗️ System Architecture](#️-system-architecture)
 - [📂 Repository \& File Structure](#-repository--file-structure)
 - [🧩 Pluggable Tool Adapter Pattern](#-pluggable-tool-adapter-pattern)
 - [🚀 Quick Start \& Installation](#-quick-start--installation)
 - [🪟 Windows Desktop Application (Electron.js)](#-windows-desktop-application-electronjs)
 - [⚙️ Optional Localhost Server (Ghostscript)](#️-optional-localhost-server-ghostscript)
+- [🧪 Automated Testing & Verification](#-automated-testing--verification)
 - [📚 Documentation Index](#-documentation-index)
 - [📄 License](#-license)
 
@@ -47,18 +50,19 @@ Most online PDF tools (e.g., iLovePDF, Smallpdf) require users to upload sensiti
 1. **🛡️ 100% Private & Zero Cloud Transmission**: Every document manipulation runs **entirely in your browser memory**. Bytes, pixels, and OCR text never leave your machine.
 2. **⚡ Blazing Fast Local Processing**: Native WebAssembly, OffscreenCanvas downsampling, and modern JavaScript engines deliver instant results without network upload or download latency.
 3. **🎨 Luxury Modern Aesthetics**: Crafted using a curated **Luxury Sage** and **Warm Cream** design system, interactive 3D particle physics via Three.js, fluid Framer Motion animations, and zero-line-break responsive navigation.
-4. **🔌 Modular Adapter Architecture**: All 33 tools follow a unified, pluggable adapter contract, making the codebase extensible and clean.
+4. **🔌 Modular Adapter Architecture**: All 35 tools follow a unified, pluggable adapter contract, making the codebase extensible and clean.
 
 ---
 
 ## ✨ Key Features
 
-- **33 Production-Grade Tools**: Full coverage across PDF organization, optimization, conversion, editing, security, and high-resolution image processing.
+- **35 Production-Grade Tools**: Full coverage across PDF organization, optimization, conversion, editing, security, and high-resolution image processing.
+- **High-Capacity 1,000+ Image Merger**: Merge hundreds or thousands of photos into a single consolidated PDF or stitched continuous photo strip with zero browser memory exhaustion.
 - **True In-Browser PDF to DOCX**: Extracts text coordinates, font styles, and paragraphs using `pdfjs-dist` and generates native Microsoft Word `.docx` documents via OpenXML.
 - **4-Tier Intelligent Compression**: Features Extreme, Recommended, Light, and Custom downsampling modes with HTML5 Canvas downscaling and PDF object stream deduplication.
 - **Ambient 3D Visuals**: Interactive background powered by `Three.js` that reacts gently to mouse velocity and window scrolling.
 - **Diagnostic Splash Screen**: Real-time diagnostic boot sequence that verifies WebAssembly buffers, engine adapters, and privacy shields, with an immediate fallback pre-React loader in `index.html`.
-- **Drag-and-Drop Staging Workspace**: Intuitive file card management, reordering (move up/down), real-time file size calculations, multi-file batch downloads, and celebratory confetti.
+- **Drag-and-Drop Staging Workspace**: Intuitive file card management, 30-item windowed pagination for large queues, reordering (move up/down), A-Z/Z-A sorting, real-time file size calculations, multi-file batch downloads, and celebratory confetti.
 
 ---
 
@@ -77,7 +81,7 @@ Most online PDF tools (e.g., iLovePDF, Smallpdf) require users to upload sensiti
 | **Word Generation** | **docx (v9.9)** | Client-side OpenXML `.docx` generator with styling, paragraphs, tables |
 | **Archive Packaging** | **jszip (v3.10)** | Multi-file ZIP bundling for batch extractions and conversions |
 | **File Staging** | **react-dropzone** | Accessible drag-and-drop file ingestion with MIME validation |
-| **Icons** | **Lucide React** | Consistent, modern vector iconography across all 33 tools |
+| **Icons** | **Lucide React** | Consistent, modern vector iconography across all 35 tools |
 | **Backend (Optional)** | **Node.js + Express** | Optional localhost helper on port 3001 for native Ghostscript CLI |
 
 ---
@@ -108,7 +112,7 @@ The user interface adheres to a strict luxury design system inspired by organic 
 
 ---
 
-## 🗂️ Complete Tool Catalog (33 Tools / 7 Suites)
+## 🗂️ Complete Tool Catalog (35 Tools / 7 Suites)
 
 ### 1. 🗂️ ORGANIZE PDF
 | Tool ID | Name | Accepted Inputs | Key Capabilities |
@@ -167,10 +171,27 @@ The user interface adheres to a strict luxury design system inspired by organic 
 ### 7. 🖼️ IMAGE TOOLS
 | Tool ID | Name | Accepted Inputs | Key Capabilities |
 | :--- | :--- | :--- | :--- |
+| `merge-images` | **Merge Images** | Multiple Images (1,000+) | Combine unlimited images into a single PDF document or stitched continuous photo strip (vertical, horizontal, grid) |
 | `compress-image` | **Compress Image** | JPG, PNG, WebP | Shrink image file size with smart quality sliders and dimension preservation |
 | `resize-image` | **Resize Image** | Any Image | Scale images by percentage or custom width/height with aspect-ratio locking |
 | `crop-image` | **Crop Image** | Any Image | Crop images with preset aspect ratios (1:1, 16:9, 4:3) or custom pixel margins |
 | `convert-to-jpg` | **Convert to JPG** | PNG, WebP, SVG, BMP | Transcode arbitrary image formats into standard, universal JPEG files |
+
+---
+
+## 🖼️ High-Capacity 1,000+ Image Merger Engine
+
+The **Image Merger (`merge-images`)** tool is built from the ground up for massive batch workflows without performance degradation:
+
+- **1,000+ Images Without Limits**: Engineered with lazy buffer inspection in `pdf-magic.js`—raw binary arrays are read on-demand during conversion rather than held simultaneously in React state, maintaining near-zero browser memory pressure.
+- **Two Flexible Output Modes**:
+  1. **Single Consolidated PDF Document**: Stream-compiled page by page with `pdf-lib` and object streams. Yields execution every 5 images (`setTimeout(0)`) so the UI maintains 60 FPS while reporting live conversion progress.
+  2. **Single Continuous Stitched Image**: Combines photos into a single continuous visual:
+     - **Vertical Strip**: Sequentially stacked photos.
+     - **Horizontal Strip**: Side-by-side panoramic layout.
+     - **Grid Collage**: Multi-column mosaic (2–10 columns or automatic square matrix) with canvas dimension safety guards (capping at 16,384 px max dimension).
+- **Non-Blocking Uploader**: Processes multi-thousand file drops in batches of 50 with live feedback (`"Loading 450 of 1,200 files..."`).
+- **High-Capacity Queue Controls**: 30-item windowed pagination, alphabetical sorting (**A-Z / Z-A**), and **Reverse Order** buttons.
 
 ---
 
@@ -253,14 +274,14 @@ ILoveMyOfficeWorks/
 │       │   └── OperationBar.jsx       # Action execution trigger & progress indicator
 │       ├── registry/                  # Pluggable Tool Adapter Registry
 │       │   ├── registry.js            # Central adapter loader & dispatcher
-│       │   └── adapters/              # 34 Pluggable Tool Adapters
+│       │   └── adapters/              # 35 Pluggable Tool Adapters
 │       │       ├── merge-pdf.js
 │       │       ├── split-pdf.js
 │       │       ├── compress-pdf.js
 │       │       ├── pdf-to-docx.js
-│       │       ├── pdf-to-jpg.js
+│       │       ├── merge-images.js        # 1,000+ Image Merger engine
 │       │       ├── protect-pdf.js
-│       │       └── ... (34 adapters)
+│       │       └── ... (35 adapters)
 │       └── utils/                     # Core computational engines
 │           ├── pdf-compressor-engine.js  # Canvas downsampler + object stream cleaner
 │           ├── pdf-to-docx-engine.js    # PDF.js to Word OpenXML converter
@@ -377,10 +398,10 @@ The optimized production bundle will be output to `client/dist/`.
 
 ## 🪟 Windows Desktop Application (Electron.js)
 
-The project includes a dedicated `desktop/` folder containing the full **Electron.js Windows Desktop Edition**:
+The project includes a dedicated `desktop/` workspace containing the full **Electron.js Windows Desktop Edition (v2.5.0)**:
 
-### 1. Run Desktop in Development Mode
-Runs Vite dev server with live hot-reloading and launches Electron:
+### 1. Run Desktop in Development Mode (Live HMR)
+Runs the Vite development server with hot-module reloading and attaches Electron:
 ```bash
 npm run desktop:dev
 ```
@@ -391,30 +412,77 @@ Tests the desktop application against the compiled static client bundle:
 npm run desktop:start
 ```
 
-### 3. Package Windows Executables (.exe & NSIS Installer)
-Generates both an NSIS installer and a single-file portable Windows executable:
+### 3. Package Windows Executables (.exe)
+Compiles the client and packages the standalone Windows portable executable with embedded multi-resolution brand icon:
 ```bash
+# From project root:
 npm run desktop:build
+
+# Or use the shorthand alias from root:
+npm run desktop:make
+
+# Or directly inside the desktop directory:
+cd desktop
+npm run make
 ```
-Output files will be saved in `desktop/dist-electron/`:
-- `ILoveMyOfficeWorks-Windows-1.0.0.exe` (Windows Installer)
-- `ILoveMyOfficeWorks-Windows-Portable-1.0.0.exe` (Single-file Portable)
+
+Output files will be saved in [`desktop/dist-electron/`](file:///d:/ILoveMyOfficeWorks/desktop/dist-electron/):
+- **`ILoveMyOfficeWorks-Windows-Portable-2.5.0.exe`** (~73.6 MB) — **Single-File Portable Executable.** Runs immediately on any Windows 10/11 computer without installation or admin rights.
+- **`win-unpacked/ILoveMyOfficeWorks.exe`** — Unpacked portable folder distribution.
+
+### 🖼️ True Multi-Resolution Windows Application Icon (`icon.ico`)
+The executable embeds a high-DPI Windows icon containing **7 mipmap resolutions**:
+- **16 × 16, 24 × 24, 32 × 32, 48 × 48, 64 × 64** (Uncompressed BMP/DIB for title bars, taskbars, and standard DPI shortcuts)
+- **128 × 128, 256 × 256** (PNG-compressed for Large / Extra Large File Explorer views and High-DPI 4K monitors)
+
+This guarantees the Luxury Sage brand logo renders crisply with zero blur or generic Electron fallbacks.
 
 ### 🌟 Desktop-Exclusive Windows Features:
-- **Luxury Sage Frameless Title Bar**: Native minimize, maximize/restore, and close buttons integrated directly with the UI.
-- **Windows File Associations**: Native `.pdf` registration and support for opening files via double-click from File Explorer.
+- **Luxury Sage Frameless Title Bar**: Seamlessly matches `#FAF8F4` and `#5B7147` tokens with native minimize, maximize/restore, and close buttons, plus smooth multi-monitor window dragging.
+- **Windows File Associations (`.pdf`)**: Double-clicking any `.pdf` in File Explorer automatically opens it in ILoveMyOfficeWorks.
 - **Native File Dialogs**: Native Windows Save / Open file dialogs.
-- **Direct Save & Explorer Reveal**: Save directly to local folders and reveal in Windows File Explorer with one click.
+- **Direct Save & Explorer Reveal**: Save directly to disk and reveal in Windows File Explorer (`shell.showItemInFolder`) with one click.
+- **100% Offline Privacy**: Zero outbound network requests—safe for air-gapped corporate and legal environments.
+
+### 🛡️ Windows SmartScreen Note
+On first launch, Windows SmartScreen may show an *"Unrecognized app"* notice because the executable is self-distributed rather than signed with a commercial certificate. Simply click **"More info"** → **"Run anyway"** to launch.
 
 ---
 
 ## ⚙️ Optional Localhost Server (Ghostscript)
 
-While **all 33 tools run 100% in the browser** without any server required, the optional local Node backend (`server/server.js`) can leverage system-installed **Ghostscript** for industrial-grade compression if available:
+While **all 35 tools run 100% in the browser** without any server required, the optional local Node backend (`server/server.js`) can leverage system-installed **Ghostscript** for industrial-grade compression if available:
 
 - Runs on **`http://localhost:3001`**.
 - Automatically checks for `gs`, `gswin64c`, or `gswin32c`.
 - If Ghostscript is not detected or the server is stopped, the client **automatically falls back to pure in-browser canvas and object-stream compression**.
+
+---
+
+## 🧪 Automated Testing & Verification
+
+The codebase includes an automated test suite executed with Node.js's native test runner (`node --test`):
+
+```bash
+# Run the complete test suite (39 automated unit & privacy tests)
+npm test
+```
+
+### What the Test Suite Verifies:
+1. **Security & Privacy Audit Tests**:
+   - Asserts that none of the 35 tool adapters contain external HTTP/HTTPS network calls, ensuring 100% client-side privacy.
+   - Validates that server Ghostscript command execution is protected against shell injection vulnerabilities.
+   - Audits redaction adapters for true stream-level data removal vs cosmetic overlays.
+2. **Adapter Registry Architecture & Contract Compliance**:
+   - Verifies all 35 adapters have unique IDs, adhere to the adapter specification contract (`accepts`, `options`, `execute`), and handle empty/invalid inputs gracefully.
+   - Validates password-protected PDF rejection logic and dynamic validation evaluation.
+3. **Tool Adapter Operations Execution**:
+   - Tests core document operations: merging, splitting by range, deleting pages, extraction, rotation, watermarking, page numbers, form flattening, ISO PDF/A metadata embedding, and cryptographic signing badges.
+   - Robustness tests for Unicode, emojis, and typographic characters.
+4. **Backend Server API & Ghostscript Bridge**:
+   - Tests server health endpoints, fallback responses (HTTP 503) when Ghostscript is unavailable, and temporary file cleanup.
+5. **PDF Magic Utilities & File Inspector**:
+   - Tests byte inspection, `%PDF-` header validation, 200MB file size limits, and image/Office file format detection.
 
 ---
 
