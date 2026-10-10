@@ -20,16 +20,12 @@
   "win": {
     "target": [
       {
-        "target": "nsis",
-        "arch": ["x64"]
-      },
-      {
         "target": "portable",
         "arch": ["x64"]
       }
     ],
     "icon": "assets/icon.ico",
-    "artifactName": "${productName}-Windows-${version}.${ext}",
+    "artifactName": "${productName}-Windows-Portable-${version}.${ext}",
     "fileAssociations": [
       {
         "ext": "pdf",
