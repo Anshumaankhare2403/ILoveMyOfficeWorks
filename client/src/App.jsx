@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Files,
@@ -39,6 +39,8 @@ import HomeScreen from './components/HomeScreen';
 import Uploader from './components/Uploader';
 import FileCard from './components/FileCard';
 import OperationBar from './components/OperationBar';
+import DesktopTitleBar from './components/DesktopTitleBar';
+import { inspectPdfFile } from './utils/pdf-magic';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -137,6 +139,61 @@ function MainApp() {
     setFiles((prev) => [...prev, ...newFiles]);
   };
 
+  // Convert raw base64 desktop files received from Electron IPC
+  const importDesktopFiles = async (rawFiles) => {
+    if (!rawFiles || rawFiles.length === 0) return;
+    const validItems = [];
+    for (const rf of rawFiles) {
+      try {
+        const binaryStr = atob(rf.data);
+        const len = binaryStr.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryStr.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: rf.type });
+        const file = new File([blob], rf.name, { type: rf.type, lastModified: Date.now() });
+        const inspected = await inspectPdfFile(file);
+        validItems.push({
+          id: `${file.name}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          ...inspected,
+        });
+      } catch (err) {
+        console.error('Failed to import desktop file:', rf.name, err);
+      }
+    }
+    if (validItems.length > 0) {
+      setFiles((prev) => [...prev, ...validItems]);
+      if (validItems.length === 1) {
+        setActiveTab('split');
+      } else {
+        setActiveTab('merge');
+      }
+    }
+  };
+
+  // Listen for files passed by Windows desktop launcher or explorer
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.electronAPI) {
+      if (window.electronAPI.getInitialFiles) {
+        window.electronAPI.getInitialFiles().then((rawFiles) => {
+          if (rawFiles && rawFiles.length > 0) {
+            importDesktopFiles(rawFiles);
+          }
+        }).catch(() => {});
+      }
+
+      if (window.electronAPI.onFileOpened) {
+        const unsubscribe = window.electronAPI.onFileOpened((rawFiles) => {
+          if (rawFiles && rawFiles.length > 0) {
+            importDesktopFiles(rawFiles);
+          }
+        });
+        return unsubscribe;
+      }
+    }
+  }, []);
+
   // Handles quick drop from the home screen
   const handleHomeQuickUpload = (newFiles) => {
     setFiles((prev) => [...prev, ...newFiles]);
@@ -231,6 +288,9 @@ function MainApp() {
 
   return (
     <div className="relative min-h-screen bg-[#FAF8F4] text-[#262D20] flex flex-col selection:bg-[#5B7147] selection:text-white font-sans overflow-x-hidden">
+      {/* Desktop Native Title Bar for Electron Windows App */}
+      <DesktopTitleBar />
+
       {/* Splash Screen on Initial Load */}
       <AnimatePresence>
         {showSplash && (

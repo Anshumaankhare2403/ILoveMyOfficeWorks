@@ -31,6 +31,7 @@
 - [📂 Repository \& File Structure](#-repository--file-structure)
 - [🧩 Pluggable Tool Adapter Pattern](#-pluggable-tool-adapter-pattern)
 - [🚀 Quick Start \& Installation](#-quick-start--installation)
+- [🪟 Windows Desktop Application (Electron.js)](#-windows-desktop-application-electronjs)
 - [⚙️ Optional Localhost Server (Ghostscript)](#️-optional-localhost-server-ghostscript)
 - [📚 Documentation Index](#-documentation-index)
 - [📄 License](#-license)
@@ -264,9 +265,15 @@ ILoveMyOfficeWorks/
 │           ├── pdf-compressor-engine.js  # Canvas downsampler + object stream cleaner
 │           ├── pdf-to-docx-engine.js    # PDF.js to Word OpenXML converter
 │           └── pdf-magic.js             # Encryption detector & metadata inspector
-└── server/                            # Optional Localhost Ghostscript Helper
-    ├── package.json                   # Server dependencies (express, cors, multer)
-    └── server.js                      # Localhost Ghostscript bridge (Port 3001)
+├── desktop/                           # Windows Desktop Application (Electron.js)
+│   ├── assets/                        # Windows .ico and .png app icons
+│   ├── main.cjs                       # Electron main process (frameless window, IPC, dialogs)
+│   ├── preload.cjs                    # Secure contextBridge API for desktop features
+│   ├── electron-builder.json          # Windows installer (NSIS) and portable config
+│   ├── package.json                   # Desktop scripts & Electron dependencies
+│   └── README.md                      # Desktop setup and build guide
+└── server/                            # Optional Localhost Helper (Port 3001)
+    └── server.js                      # Localhost Ghostscript bridge (optional)
 ```
 
 ---
@@ -365,6 +372,39 @@ Open your browser and navigate to: **`http://localhost:5173/`**
 npm run build --prefix client
 ```
 The optimized production bundle will be output to `client/dist/`.
+
+---
+
+## 🪟 Windows Desktop Application (Electron.js)
+
+The project includes a dedicated `desktop/` folder containing the full **Electron.js Windows Desktop Edition**:
+
+### 1. Run Desktop in Development Mode
+Runs Vite dev server with live hot-reloading and launches Electron:
+```bash
+npm run desktop:dev
+```
+
+### 2. Run Desktop Production Build Locally
+Tests the desktop application against the compiled static client bundle:
+```bash
+npm run desktop:start
+```
+
+### 3. Package Windows Executables (.exe & NSIS Installer)
+Generates both an NSIS installer and a single-file portable Windows executable:
+```bash
+npm run desktop:build
+```
+Output files will be saved in `desktop/dist-electron/`:
+- `ILoveMyOfficeWorks-Windows-1.0.0.exe` (Windows Installer)
+- `ILoveMyOfficeWorks-Windows-Portable-1.0.0.exe` (Single-file Portable)
+
+### 🌟 Desktop-Exclusive Windows Features:
+- **Luxury Sage Frameless Title Bar**: Native minimize, maximize/restore, and close buttons integrated directly with the UI.
+- **Windows File Associations**: Native `.pdf` registration and support for opening files via double-click from File Explorer.
+- **Native File Dialogs**: Native Windows Save / Open file dialogs.
+- **Direct Save & Explorer Reveal**: Save directly to local folders and reveal in Windows File Explorer with one click.
 
 ---
 

@@ -141,7 +141,7 @@ export default function SplashScreen({ onComplete }) {
             className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white p-1.5 shadow-2xl shadow-[#5B7147]/25 border-2 border-[#DDD3C2] overflow-hidden"
           >
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="ILoveMyOfficeWorks Brand Logo"
               className="w-full h-full object-cover rounded-[18px]"
             />

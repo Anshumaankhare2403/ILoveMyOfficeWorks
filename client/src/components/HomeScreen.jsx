@@ -509,7 +509,7 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
           >
             <div className="absolute inset-0 bg-[#5B7147] rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="ILoveMyOfficeWorks Logo"
               className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover shadow-xl shadow-[#5B7147]/15 border border-[#DDD3C2] group-hover:scale-105 transition-transform"
             />

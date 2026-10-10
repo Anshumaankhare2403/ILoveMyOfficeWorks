@@ -8,10 +8,15 @@
     "start": "electron .",
     "dev": "electron . --dev",
     "build": "npm run build --prefix ../client && electron-builder --win",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder --win",
-    "dist:portable": "electron-builder --win portable",
-    "dist:nsis": "electron-builder --win nsis"
+    "pack": "npm run build --prefix ../client && electron-builder --dir",
+    "dist": "npm run build --prefix ../client && electron-builder --win",
+    "dist:portable": "npm run build --prefix ../client && electron-builder --win portable",
+    "dist:nsis": "npm run build --prefix ../client && electron-builder --win nsis",
+    "desktop:pack": "npm run pack",
+    "desktop:dev": "npm run dev",
+    "desktop:build": "npm run build",
+    "desktop:start": "npm run start",
+    "desktop:portable": "npm run dist:portable"
   },
   "devDependencies": {
     "electron": "^34.2.0",

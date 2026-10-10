@@ -466,7 +466,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
           <div className="relative">
             <div className="absolute inset-0 bg-[#5B7147] rounded-xl blur-md opacity-25 group-hover:opacity-45 transition-opacity" />
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="ILoveMyOfficeWorks"
               className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover shadow-md shadow-[#5B7147]/20 border border-[#DDD3C2] group-hover:scale-105 transition-transform"
             />
