@@ -1,10 +1,5 @@
 import { PDFDocument, rgb } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-}
+import { pdfjsLib } from '../../utils/pdfjs-init.js';
 
 const redactPdfAdapter = {
   id: 'redact-pdf',
@@ -68,37 +63,42 @@ const redactPdfAdapter = {
 
     onProgress(25, 'Analyzing text locations for permanent redaction...');
 
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(arrayBuffer.slice(0)),
-      cMapUrl: '/cmaps/',
-      cMapPacked: true,
-      standardFontDataUrl: '/standard_fonts/',
-    });
-
-    const pdf = await loadingTask.promise;
-    const numPages = pdf.numPages;
-
+    let pdf = null;
     const matchesByPage = [];
 
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const items = textContent.items || [];
-      const matches = [];
+    try {
+      const loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(arrayBuffer.slice(0)),
+        cMapUrl: '/cmaps/',
+        cMapPacked: true,
+        standardFontDataUrl: '/standard_fonts/',
+      });
 
-      if (preset === 'keyword' && keyword) {
-        for (const item of items) {
-          if (item.str && item.str.toLowerCase().includes(keyword)) {
-            matches.push({
-              x: item.transform[4],
-              y: item.transform[5],
-              width: item.width || 60,
-              height: item.height || 14,
-            });
+      pdf = await loadingTask.promise;
+      const numPages = pdf.numPages;
+
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const items = textContent.items || [];
+        const matches = [];
+
+        if (preset === 'keyword' && keyword) {
+          for (const item of items) {
+            if (item.str && item.str.toLowerCase().includes(keyword)) {
+              matches.push({
+                x: item.transform[4],
+                y: item.transform[5],
+                width: item.width || 60,
+                height: item.height || 14,
+              });
+            }
           }
         }
+        matchesByPage.push(matches);
       }
-      matchesByPage.push(matches);
+    } finally {
+      try { await pdf?.destroy(); } catch {}
     }
 
     onProgress(60, 'Applying black redaction boxes and vector flattening...');

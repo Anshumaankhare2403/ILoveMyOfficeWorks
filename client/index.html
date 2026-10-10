@@ -4,14 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ILoveMyOfficeWorks — Personal PDF Toolkit</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="apple-touch-icon" href="./logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   </head>
   <body class="bg-[#FAF8F4] text-[#1E2619] min-h-screen antialiased selection:bg-[#5E724A] selection:text-white">
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-splash-fallback" style="position:fixed;inset:0;background:#FAF8F4;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;z-index:9999;user-select:none;">
+        <div style="position:relative;margin-bottom:20px;">
+          <div style="position:absolute;inset:-16px;background:rgba(91,113,71,0.25);border-radius:28px;filter:blur(24px);"></div>
+          <div style="position:relative;width:96px;height:96px;border-radius:24px;background:#ffffff;padding:6px;box-shadow:0 20px 25px -5px rgba(91,113,71,0.2);border:2px solid #DDD3C2;overflow:hidden;">
+            <img src="./logo.png" alt="ILoveMyOfficeWorks" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />
+          </div>
+        </div>
+        <div style="font-size:24px;font-weight:900;color:#1E2619;letter-spacing:-0.03em;margin-bottom:6px;">
+          ILoveMy<span style="color:#5B7147;">OfficeWorks</span>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:#6B795D;margin-bottom:24px;letter-spacing:0.02em;">
+          100% PRIVATE • ZERO CLOUD • CLIENT-SIDE SUITE
+        </div>
+        <div style="width:180px;height:6px;background:#E8E1D5;border-radius:9999px;overflow:hidden;position:relative;">
+          <div style="height:100%;background:#5B7147;border-radius:9999px;animation:initialPulse 1.2s infinite ease-in-out;"></div>
+        </div>
+        <style>
+          @keyframes initialPulse {
+            0% { transform: translateX(-100%); width: 30%; }
+            50% { width: 60%; }
+            100% { transform: translateX(200%); width: 30%; }
+          }
+        </style>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

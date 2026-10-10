@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Files,
@@ -31,6 +31,11 @@ import {
   Wrench,
   FileSearch,
   Maximize2,
+  Images,
+  ChevronLeft,
+  ChevronRight,
+  ArrowDownAZ,
+  ArrowUpZA,
 } from 'lucide-react';
 import ThreeCanvas from './components/ThreeCanvas';
 import SplashScreen from './components/SplashScreen';
@@ -39,6 +44,8 @@ import HomeScreen from './components/HomeScreen';
 import Uploader from './components/Uploader';
 import FileCard from './components/FileCard';
 import OperationBar from './components/OperationBar';
+import DesktopTitleBar from './components/DesktopTitleBar';
+import { inspectPdfFile } from './utils/pdf-magic';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -121,6 +128,7 @@ const TOOL_CONFIGS = {
   'compare-pdf': { id: 'compare-pdf', name: 'Compare PDF', icon: GitCompare, badge: 'Security', desc: 'Compare two PDF documents side-by-side, analyze text and page differences, and generate audit report', hint: 'Upload 2 PDF documents to compare differences.' },
 
   // 7. Image Tools
+  'merge-images': { id: 'merge-images', name: 'Merge Images', icon: Images, badge: 'Image Merger', desc: 'Combine unlimited images (1,000+ supported) into a single PDF document or stitched continuous photo', hint: 'Upload 2 or more images (JPG, PNG, WebP) to merge without limits.' },
   'compress-image': { id: 'compress-image', name: 'Compress Image', icon: Minimize2, badge: 'Image', desc: 'Shrink image file size with smart Canvas re-encoding and quality downsampling', hint: 'Upload 1 or more images (JPG, PNG, WebP) to compress.' },
   'resize-image': { id: 'resize-image', name: 'Resize Image', icon: Maximize2, badge: 'Image', desc: 'Change image dimensions by percentage scale or exact pixel width and height', hint: 'Upload 1 or more images to resize.' },
   'crop-image': { id: 'crop-image', name: 'Crop Image', icon: Crop, badge: 'Image', desc: 'Crop photos and images with preset aspect ratios or custom pixel bounding boxes', hint: 'Upload 1 or more images to crop.' },
@@ -137,13 +145,80 @@ function MainApp() {
     setFiles((prev) => [...prev, ...newFiles]);
   };
 
+  // Convert raw base64 desktop files received from Electron IPC
+  const importDesktopFiles = async (rawFiles) => {
+    if (!rawFiles || rawFiles.length === 0) return;
+    const validItems = [];
+    for (const rf of rawFiles) {
+      try {
+        const binaryStr = atob(rf.data);
+        const len = binaryStr.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryStr.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: rf.type });
+        const file = new File([blob], rf.name, { type: rf.type, lastModified: Date.now() });
+        const inspected = await inspectPdfFile(file);
+        validItems.push({
+          id: `${file.name}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          ...inspected,
+        });
+      } catch (err) {
+        console.error('Failed to import desktop file:', rf.name, err);
+      }
+    }
+    if (validItems.length > 0) {
+      setFiles((prev) => [...prev, ...validItems]);
+      if (validItems.length === 1) {
+        setActiveTab('split');
+      } else {
+        setActiveTab('merge');
+      }
+    }
+  };
+
+  // Listen for files passed by Windows desktop launcher or explorer
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.electronAPI) {
+      if (window.electronAPI.getInitialFiles) {
+        window.electronAPI.getInitialFiles().then((rawFiles) => {
+          if (rawFiles && rawFiles.length > 0) {
+            importDesktopFiles(rawFiles);
+          }
+        }).catch(() => {});
+      }
+
+      if (window.electronAPI.onFileOpened) {
+        const unsubscribe = window.electronAPI.onFileOpened((rawFiles) => {
+          if (rawFiles && rawFiles.length > 0) {
+            importDesktopFiles(rawFiles);
+          }
+        });
+        return unsubscribe;
+      }
+    }
+  }, []);
+
+  const [queuePage, setQueuePage] = useState(1);
+  const PAGE_SIZE = 30;
+
   // Handles quick drop from the home screen
   const handleHomeQuickUpload = (newFiles) => {
     setFiles((prev) => [...prev, ...newFiles]);
     if (newFiles.length === 1) {
-      setActiveTab('split');
+      if (newFiles[0].isImage) {
+        setActiveTab('compress-image');
+      } else {
+        setActiveTab('split');
+      }
     } else {
-      setActiveTab('merge');
+      const allImages = newFiles.every((f) => f.isImage);
+      if (allImages) {
+        setActiveTab('merge-images');
+      } else {
+        setActiveTab('merge');
+      }
     }
   };
 
@@ -153,6 +228,7 @@ function MainApp() {
 
   const handleClearAll = () => {
     setFiles([]);
+    setQueuePage(1);
   };
 
   const handleMoveUp = (index) => {
@@ -175,6 +251,18 @@ function MainApp() {
       next[index] = temp;
       return next;
     });
+  };
+
+  const handleSortAscending = () => {
+    setFiles((prev) => [...prev].sort((a, b) => (a.name || '').localeCompare(b.name || '')));
+  };
+
+  const handleSortDescending = () => {
+    setFiles((prev) => [...prev].sort((a, b) => (b.name || '').localeCompare(a.name || '')));
+  };
+
+  const handleReverseOrder = () => {
+    setFiles((prev) => [...prev].reverse());
   };
 
   const pdfCount = files.filter((f) => f.isPdf).length;
@@ -223,6 +311,7 @@ function MainApp() {
     'sign-pdf': pdfCount,
     'redact-pdf': pdfCount,
     'compare-pdf': pdfCount,
+    'merge-images': imageCount,
     'compress-image': imageCount,
     'resize-image': imageCount,
     'crop-image': imageCount,
@@ -231,6 +320,9 @@ function MainApp() {
 
   return (
     <div className="relative min-h-screen bg-[#FAF8F4] text-[#262D20] flex flex-col selection:bg-[#5B7147] selection:text-white font-sans overflow-x-hidden">
+      {/* Desktop Native Title Bar for Electron Windows App */}
+      <DesktopTitleBar />
+
       {/* Splash Screen on Initial Load */}
       <AnimatePresence>
         {showSplash && (
@@ -246,6 +338,7 @@ function MainApp() {
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab)}
         fileCounts={fileCounts}
+        onShowSplash={() => setShowSplash(true)}
       />
 
       {/* Main Content Area */}
@@ -263,6 +356,7 @@ function MainApp() {
                 onSelectTool={(toolId) => setActiveTab(toolId)}
                 onQuickUpload={handleHomeQuickUpload}
                 fileCounts={fileCounts}
+                onShowSplash={() => setShowSplash(true)}
               />
             </motion.div>
           )}
@@ -323,37 +417,149 @@ function MainApp() {
                 ) : (
                   <div className="space-y-6">
                     {/* File Queue Toolbar */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2 text-xs font-bold text-[#262D20]">
                         <Files className="w-4 h-4 text-[#5B7147]" />
                         <span>Document Queue ({files.length})</span>
+                        {files.length >= 100 && (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#5B7147]/15 text-[#3C4A2E] font-bold border border-[#5B7147]/20 whitespace-nowrap">
+                            ⚡ 1,000+ High-Capacity
+                          </span>
+                        )}
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleClearAll}
-                        className="text-xs text-[#717E64] hover:text-rose-600 flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded-lg hover:bg-rose-50 font-medium"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Clear all</span>
-                      </button>
+
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {files.length > 1 && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={handleSortAscending}
+                              title="Sort alphabetically (A to Z)"
+                              className="text-[11px] text-[#556348] hover:text-[#262D20] bg-white hover:bg-[#FAF8F4] border border-[#DDD3C2] flex items-center gap-1 transition-all px-2.5 py-1 rounded-lg font-medium shadow-2xs whitespace-nowrap"
+                            >
+                              <ArrowDownAZ className="w-3.5 h-3.5" />
+                              <span>A-Z</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleSortDescending}
+                              title="Sort alphabetically (Z to A)"
+                              className="text-[11px] text-[#556348] hover:text-[#262D20] bg-white hover:bg-[#FAF8F4] border border-[#DDD3C2] flex items-center gap-1 transition-all px-2.5 py-1 rounded-lg font-medium shadow-2xs whitespace-nowrap"
+                            >
+                              <ArrowUpZA className="w-3.5 h-3.5" />
+                              <span>Z-A</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleReverseOrder}
+                              title="Reverse current queue sequence"
+                              className="text-[11px] text-[#556348] hover:text-[#262D20] bg-white hover:bg-[#FAF8F4] border border-[#DDD3C2] flex items-center gap-1 transition-all px-2.5 py-1 rounded-lg font-medium shadow-2xs whitespace-nowrap"
+                            >
+                              <ArrowUpDown className="w-3.5 h-3.5" />
+                              <span>Reverse</span>
+                            </button>
+                          </>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={handleClearAll}
+                          className="text-xs text-[#717E64] hover:text-rose-600 flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded-lg hover:bg-rose-50 font-medium whitespace-nowrap"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Clear all</span>
+                        </button>
+                      </div>
                     </div>
 
                     {/* Responsive grid: Left side list, Right side operations */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                       <div className="lg:col-span-7 space-y-3 order-2 lg:order-1">
+                        {/* High capacity pagination header if > PAGE_SIZE */}
+                        {files.length > PAGE_SIZE && (
+                          <div className="flex items-center justify-between gap-3 p-3 bg-white border border-[#DDD3C2] rounded-2xl text-xs shadow-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-[#262D20]">
+                                Showing {((Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1) - 1) * PAGE_SIZE) + 1}–{Math.min(Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1) * PAGE_SIZE, files.length)} of {files.length}
+                              </span>
+                              <span className="text-[#96A48B]">•</span>
+                              <span className="text-[#4F5E41] font-semibold bg-[#5B7147]/10 px-2 py-0.5 rounded-full border border-[#5B7147]/20">
+                                Page {Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1)} of {Math.ceil(files.length / PAGE_SIZE) || 1}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => setQueuePage((p) => Math.max(1, p - 1))}
+                                disabled={Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1) <= 1}
+                                className="p-1 px-2.5 rounded-lg border border-[#DDD3C2] hover:border-[#5B7147] bg-[#FAF8F4] hover:bg-white text-[#262D20] disabled:opacity-30 transition-all flex items-center gap-1 font-semibold"
+                              >
+                                <ChevronLeft className="w-3.5 h-3.5" /> Prev
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setQueuePage((p) => Math.min(Math.ceil(files.length / PAGE_SIZE) || 1, p + 1))}
+                                disabled={Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1) >= (Math.ceil(files.length / PAGE_SIZE) || 1)}
+                                className="p-1 px-2.5 rounded-lg border border-[#DDD3C2] hover:border-[#5B7147] bg-[#FAF8F4] hover:bg-white text-[#262D20] disabled:opacity-30 transition-all flex items-center gap-1 font-semibold"
+                              >
+                                Next <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
                         <AnimatePresence>
-                          {files.map((fileItem, idx) => (
-                            <FileCard
-                              key={fileItem.id}
-                              fileItem={fileItem}
-                              index={idx}
-                              totalFiles={files.length}
-                              onRemove={handleRemoveFile}
-                              onMoveUp={handleMoveUp}
-                              onMoveDown={handleMoveDown}
-                            />
-                          ))}
+                          {(() => {
+                            const totalPages = Math.ceil(files.length / PAGE_SIZE) || 1;
+                            const curPage = Math.min(queuePage, totalPages);
+                            const start = (curPage - 1) * PAGE_SIZE;
+                            const end = Math.min(start + PAGE_SIZE, files.length);
+                            const slice = files.length > PAGE_SIZE ? files.slice(start, end) : files;
+
+                            return slice.map((fileItem, localIdx) => {
+                              const globalIdx = files.length > PAGE_SIZE ? start + localIdx : localIdx;
+                              return (
+                                <FileCard
+                                  key={fileItem.id}
+                                  fileItem={fileItem}
+                                  index={globalIdx}
+                                  totalFiles={files.length}
+                                  onRemove={handleRemoveFile}
+                                  onMoveUp={handleMoveUp}
+                                  onMoveDown={handleMoveDown}
+                                />
+                              );
+                            });
+                          })()}
                         </AnimatePresence>
+
+                        {/* Bottom pagination if > PAGE_SIZE */}
+                        {files.length > PAGE_SIZE && (
+                          <div className="flex items-center justify-between gap-3 p-3 bg-white border border-[#DDD3C2] rounded-2xl text-xs shadow-xs mt-2">
+                            <span className="text-[#647257] font-medium">
+                              Page {Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1)} of {Math.ceil(files.length / PAGE_SIZE) || 1}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => setQueuePage((p) => Math.max(1, p - 1))}
+                                disabled={Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1) <= 1}
+                                className="p-1 px-2.5 rounded-lg border border-[#DDD3C2] hover:border-[#5B7147] bg-[#FAF8F4] hover:bg-white text-[#262D20] disabled:opacity-30 transition-all flex items-center gap-1 font-semibold"
+                              >
+                                <ChevronLeft className="w-3.5 h-3.5" /> Prev
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setQueuePage((p) => Math.min(Math.ceil(files.length / PAGE_SIZE) || 1, p + 1))}
+                                disabled={Math.min(queuePage, Math.ceil(files.length / PAGE_SIZE) || 1) >= (Math.ceil(files.length / PAGE_SIZE) || 1)}
+                                className="p-1 px-2.5 rounded-lg border border-[#DDD3C2] hover:border-[#5B7147] bg-[#FAF8F4] hover:bg-white text-[#262D20] disabled:opacity-30 transition-all flex items-center gap-1 font-semibold"
+                              >
+                                Next <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
 
                         <Uploader onFilesAdded={handleFilesAdded} compact={true} />
                       </div>

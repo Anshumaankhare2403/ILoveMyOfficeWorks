@@ -3,11 +3,12 @@ import cors from 'cors';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
+import crypto from 'crypto';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { fileURLToPath } from 'url';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,7 +21,7 @@ if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir, { recursive: true });
 }
 
-// Multer storage
+// Multer storage with 200MB limit
 const upload = multer({
   dest: tempDir,
   limits: { fileSize: 200 * 1024 * 1024 }, // 200MB limit
@@ -36,7 +37,7 @@ async function getGhostscriptCmd() {
   const candidates = ['gswin64c', 'gswin32c', 'gs'];
   for (const cmd of candidates) {
     try {
-      await execAsync(`${cmd} --version`);
+      await execFileAsync(cmd, ['--version'], { timeout: 5000 });
       return cmd;
     } catch {
       // not found, try next
@@ -69,7 +70,8 @@ app.post('/api/compress', upload.single('file'), async (req, res) => {
   }
 
   const inputPath = req.file.path;
-  const outputPath = path.join(tempDir, `compressed_${Date.now()}_${req.file.originalname}`);
+  const safeId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).substring(2)}`;
+  const outputPath = path.join(tempDir, `compressed_${safeId}.pdf`);
   const level = req.body.level || 'ebook'; // /screen, /ebook, /printer
 
   const gsSetting =
@@ -87,8 +89,18 @@ app.post('/api/compress', upload.single('file'), async (req, res) => {
   }
 
   try {
-    const cmd = `${gsCmd} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=${gsSetting} -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outputPath}" "${inputPath}"`;
-    await execAsync(cmd);
+    const args = [
+      '-sDEVICE=pdfwrite',
+      '-dCompatibilityLevel=1.4',
+      `-dPDFSETTINGS=${gsSetting}`,
+      '-dNOPAUSE',
+      '-dQUIET',
+      '-dBATCH',
+      `-sOutputFile=${outputPath}`,
+      inputPath,
+    ];
+
+    await execFileAsync(gsCmd, args, { timeout: 30000 });
 
     if (!fs.existsSync(outputPath)) {
       throw new Error('Ghostscript did not produce output file.');
@@ -96,11 +108,16 @@ app.post('/api/compress', upload.single('file'), async (req, res) => {
 
     const compressedBuffer = fs.readFileSync(outputPath);
 
+    // Sanitize output file name for Content-Disposition header
+    const safeOriginalName = path
+      .basename(req.file.originalname || 'document.pdf')
+      .replace(/[^a-zA-Z0-9._-]/g, '_');
+
     // Set download headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="compressed_${req.file.originalname}"`
+      `attachment; filename="compressed_${safeOriginalName}"`
     );
     res.setHeader('X-Original-Size', req.file.size);
     res.setHeader('X-Compressed-Size', compressedBuffer.length);
@@ -128,8 +145,9 @@ app.post('/api/protect', upload.single('file'), async (req, res) => {
   }
 
   const inputPath = req.file.path;
-  const outputPath = path.join(tempDir, `protected_${Date.now()}_${req.file.originalname}`);
-  const password = req.body.password || '123456';
+  const safeId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).substring(2)}`;
+  const outputPath = path.join(tempDir, `protected_${safeId}.pdf`);
+  const password = String(req.body.password || '123456').slice(0, 128);
   const gsCmd = await getGhostscriptCmd();
 
   if (!gsCmd) {
@@ -141,16 +159,35 @@ app.post('/api/protect', upload.single('file'), async (req, res) => {
   }
 
   try {
-    const cmd = `${gsCmd} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -sOwnerPassword="${password}" -sUserPassword="${password}" -dPermissions=-4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outputPath}" "${inputPath}"`;
-    await execAsync(cmd);
+    const args = [
+      '-sDEVICE=pdfwrite',
+      '-dCompatibilityLevel=1.4',
+      `-sOwnerPassword=${password}`,
+      `-sUserPassword=${password}`,
+      '-dPermissions=-4',
+      '-dNOPAUSE',
+      '-dQUIET',
+      '-dBATCH',
+      `-sOutputFile=${outputPath}`,
+      inputPath,
+    ];
+
+    await execFileAsync(gsCmd, args, { timeout: 30000 });
 
     if (!fs.existsSync(outputPath)) {
       throw new Error('Ghostscript did not produce protected file.');
     }
 
     const protectedBuffer = fs.readFileSync(outputPath);
+    const safeOriginalName = path
+      .basename(req.file.originalname || 'document.pdf')
+      .replace(/[^a-zA-Z0-9._-]/g, '_');
+
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="protected_${req.file.originalname}"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="protected_${safeOriginalName}"`
+    );
     res.send(protectedBuffer);
   } catch (err) {
     res.status(500).json({ error: `Encryption failed: ${err.message}` });
@@ -162,6 +199,22 @@ app.post('/api/protect', upload.single('file'), async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`[ILoveMyOfficeWorks Server] Running on http://localhost:${PORT}`);
+// Error handling middleware for Multer file size / format errors
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: `Upload error: ${err.message}` });
+  }
+  if (err) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+  next();
 });
+
+export { app };
+export default app;
+
+if (process.argv[1] && process.argv[1].endsWith('server.js')) {
+  app.listen(PORT, () => {
+    console.log(`[ILoveMyOfficeWorks Server] Running on http://localhost:${PORT}`);
+  });
+}

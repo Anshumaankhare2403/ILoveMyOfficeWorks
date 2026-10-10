@@ -36,6 +36,7 @@ import {
   EyeOff,
   GitCompare,
   Maximize2,
+  Images,
 } from 'lucide-react';
 import { getRegisteredAdapters, executeAdapter } from '../registry/registry';
 import { formatFileSize } from '../utils/pdf-magic';
@@ -221,6 +222,8 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
         return <EyeOff className="w-4 h-4" />;
       case 'compare-pdf':
         return <GitCompare className="w-4 h-4" />;
+      case 'merge-images':
+        return <Images className="w-4 h-4" />;
       case 'compress-image':
         return <Minimize2 className="w-4 h-4" />;
       case 'resize-image':
@@ -236,6 +239,9 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
 
   const getActionLabel = () => {
     if (isExecuting) return 'Processing document...';
+    if (activeAdapter.id === 'merge-images') {
+      return `Merge ${files.length} Images`;
+    }
     if (activeAdapter.id === 'merge-pdf') {
       return `Merge ${files.length} PDFs Sequentially`;
     }
@@ -350,15 +356,16 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                             max={opt.max}
                             value={adapterOptions[opt.id] ?? opt.default}
                             placeholder={
-                              opt.id === 'outputFilename'
+                              opt.placeholder ||
+                              (opt.id === 'outputFilename'
                                 ? activeAdapter?.id === 'compress-pdf'
-                                  ? `${files[0]?.name?.replace(/\.pdf$/i, '') || 'document'}_compressed.pdf`
+                                  ? `${files[0]?.name?.replace(/\.[^/.]+$/, '') || 'document'}_compressed.pdf`
                                   : activeAdapter?.id === 'pdf-to-docx'
-                                  ? `${files[0]?.name?.replace(/\.pdf$/i, '') || 'document'}.docx`
+                                  ? `${files[0]?.name?.replace(/\.[^/.]+$/, '') || 'document'}.docx`
                                   : activeAdapter?.id === 'split-pdf'
                                   ? 'split_part'
-                                  : 'merged-document.pdf'
-                                : opt.placeholder || ''
+                                  : `${files[0]?.name?.replace(/\.[^/.]+$/, '') || 'document'}_processed.pdf`
+                                : '')
                             }
                             onChange={(e) => handleOptionChange(opt.id, e.target.value)}
                             disabled={isExecuting}

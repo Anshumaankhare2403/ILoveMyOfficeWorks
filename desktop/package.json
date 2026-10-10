@@ -1,0 +1,25 @@
+{
+  "name": "ilovemyofficeworks-desktop",
+  "version": "1.0.0",
+  "description": "ILoveMyOfficeWorks — 100% Private Client-Side PDF Toolkit (Windows Desktop)",
+  "author": "Anshumaan Khare",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "npm run build --prefix ../client && electron-builder --win",
+    "pack": "npm run build --prefix ../client && electron-builder --dir",
+    "dist": "npm run build --prefix ../client && electron-builder --win",
+    "dist:portable": "npm run build --prefix ../client && electron-builder --win portable",
+    "dist:nsis": "npm run build --prefix ../client && electron-builder --win nsis",
+    "desktop:pack": "npm run pack",
+    "desktop:dev": "npm run dev",
+    "desktop:build": "npm run build",
+    "desktop:start": "npm run start",
+    "desktop:portable": "npm run dist:portable"
+  },
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

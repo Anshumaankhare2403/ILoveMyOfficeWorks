@@ -1,0 +1,55 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.ilovemyofficeworks.desktop",
+  "productName": "ILoveMyOfficeWorks",
+  "copyright": "Copyright © 2026 ILoveMyOfficeWorks",
+  "directories": {
+    "output": "dist-electron",
+    "buildResources": "assets"
+  },
+  "files": [
+    "main.cjs",
+    "preload.cjs",
+    "assets/**/*",
+    {
+      "from": "../client/dist",
+      "to": "client/dist",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "assets/icon.ico",
+    "artifactName": "${productName}-Windows-${version}.${ext}",
+    "fileAssociations": [
+      {
+        "ext": "pdf",
+        "name": "PDF Document",
+        "description": "Adobe Portable Document Format",
+        "role": "Editor"
+      }
+    ]
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "ILoveMyOfficeWorks",
+    "uninstallDisplayName": "ILoveMyOfficeWorks Personal PDF Toolkit",
+    "deleteAppDataOnUninstall": false
+  },
+  "portable": {
+    "artifactName": "${productName}-Windows-Portable-${version}.${ext}"
+  }
+}

@@ -1,10 +1,6 @@
 import { PDFDocument, PageSizes, StandardFonts, rgb } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-}
+import { pdfjsLib } from '../../utils/pdfjs-init.js';
+import { sanitizeWinAnsiText } from '../../utils/pdf-magic.js';
 
 const comparePdfAdapter = {
   id: 'compare-pdf',
@@ -66,21 +62,28 @@ const comparePdfAdapter = {
     const taskA = pdfjsLib.getDocument({ data: new Uint8Array(bufferA.slice(0)) });
     const taskB = pdfjsLib.getDocument({ data: new Uint8Array(bufferB.slice(0)) });
 
-    const [loadedA, loadedB] = await Promise.all([taskA.promise, taskB.promise]);
-
     let textCountA = 0;
     let textCountB = 0;
+    let loadedA = null;
+    let loadedB = null;
 
-    for (let i = 1; i <= Math.min(pagesA, 5); i++) {
-      const p = await loadedA.getPage(i);
-      const txt = await p.getTextContent();
-      textCountA += (txt.items || []).length;
-    }
+    try {
+      [loadedA, loadedB] = await Promise.all([taskA.promise, taskB.promise]);
 
-    for (let i = 1; i <= Math.min(pagesB, 5); i++) {
-      const p = await loadedB.getPage(i);
-      const txt = await p.getTextContent();
-      textCountB += (txt.items || []).length;
+      for (let i = 1; i <= Math.min(pagesA, 5); i++) {
+        const p = await loadedA.getPage(i);
+        const txt = await p.getTextContent();
+        textCountA += (txt.items || []).length;
+      }
+
+      for (let i = 1; i <= Math.min(pagesB, 5); i++) {
+        const p = await loadedB.getPage(i);
+        const txt = await p.getTextContent();
+        textCountB += (txt.items || []).length;
+      }
+    } finally {
+      try { await loadedA?.destroy?.(); } catch {}
+      try { await loadedB?.destroy?.(); } catch {}
     }
 
     onProgress(70, 'Generating PDF comparison report layout...');
@@ -194,17 +197,17 @@ const comparePdfAdapter = {
 
     const findings = [
       pagesA === pagesB
-        ? `✓ Page counts match exactly (${pagesA} pages in both documents).`
-        : `⚠ Page count mismatch: Document A has ${pagesA} pages, Document B has ${pagesB} pages.`,
-      `✓ Document A sample glyph count: ${textCountA} text items detected.`,
-      `✓ Document B sample glyph count: ${textCountB} text items detected.`,
+        ? `[MATCH] Page counts match exactly (${pagesA} pages in both documents).`
+        : `[DIFF] Page count mismatch: Document A has ${pagesA} pages, Document B has ${pagesB} pages.`,
+      `[INFO] Document A sample glyph count: ${textCountA} text items detected.`,
+      `[INFO] Document B sample glyph count: ${textCountB} text items detected.`,
       docA.size === docB.size
-        ? `✓ Exact byte size match (${docA.size} bytes).`
-        : `ℹ Size difference: ${Math.abs(docA.size - docB.size)} bytes delta (${((Math.abs(docA.size - docB.size) / docA.size) * 100).toFixed(1)}% difference).`,
+        ? `[MATCH] Exact byte size match (${docA.size} bytes).`
+        : `[DIFF] Size difference: ${Math.abs(docA.size - docB.size)} bytes delta (${((Math.abs(docA.size - docB.size) / docA.size) * 100).toFixed(1)}% difference).`,
     ];
 
     for (const f of findings) {
-      page.drawText(f, {
+      page.drawText(sanitizeWinAnsiText(f), {
         x: margin + 10,
         y: curY,
         size: 10,

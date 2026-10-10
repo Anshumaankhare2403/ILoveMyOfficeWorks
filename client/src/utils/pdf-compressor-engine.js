@@ -1,11 +1,5 @@
 import { PDFDocument, PDFName, PDFNumber, decodePDFRawStream } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-// Initialize PDF.js worker URL for Vite
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-}
+import { pdfjsLib } from './pdfjs-init.js';
 
 /**
  * Helper to recompress a JPEG buffer via in-memory canvas

@@ -36,9 +36,10 @@ import {
   GitCompare,
   Grid,
   Maximize2,
+  Images,
 } from 'lucide-react';
 
-export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
+export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShowSplash }) {
   const [openDropdown, setOpenDropdown] = useState(null); // 'organize' | 'optimize' | 'convert' | 'edit' | 'security' | 'image' | 'allTools' | null
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSectionOpen, setMobileSectionOpen] = useState('organize');
@@ -370,6 +371,15 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
   // 7. Image Tools (from user request)
   const imageTools = [
     {
+      id: 'merge-images',
+      name: 'Merge Images',
+      desc: 'Combine unlimited images (1,000+ supported) into PDF or single photo',
+      badge: '1000+ Images',
+      icon: Images,
+      iconColor: 'text-emerald-700 bg-emerald-50 border-emerald-200/60',
+      count: fileCounts['merge-images'] || 0,
+    },
+    {
       id: 'compress-image',
       name: 'Compress Image',
       desc: 'Shrink JPG, PNG, and WebP with smart Canvas re-encoding',
@@ -466,7 +476,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
           <div className="relative">
             <div className="absolute inset-0 bg-[#5B7147] rounded-xl blur-md opacity-25 group-hover:opacity-45 transition-opacity" />
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="ILoveMyOfficeWorks"
               className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover shadow-md shadow-[#5B7147]/20 border border-[#DDD3C2] group-hover:scale-105 transition-transform"
             />
@@ -477,7 +487,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                 ILoveMy<span className="text-[#5B7147]">OfficeWorks</span>
               </span>
               <span className="hidden xl:inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#435433] border border-[#5B7147]/20 whitespace-nowrap">
-                33 Tools
+                35 Tools
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-[#6B795D] font-medium hidden sm:block whitespace-nowrap">
@@ -1177,17 +1187,23 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
 
         {/* Right Status Badge & Mobile Hamburger Button */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#5B7147]/10 border border-[#5B7147]/20 text-[#3D4D2C]">
+          <button
+            type="button"
+            onClick={onShowSplash}
+            title="View Brand Splash Screen & Privacy Diagnostics"
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#5B7147]/10 hover:bg-[#5B7147]/20 border border-[#5B7147]/20 text-[#3D4D2C] transition-all cursor-pointer group"
+          >
             <span className="w-2 h-2 rounded-full bg-[#5B7147] animate-pulse" />
             <ShieldCheck className="w-3.5 h-3.5 text-[#5B7147]" />
             <span className="text-[11px] font-bold whitespace-nowrap">100% Private</span>
-          </div>
+            <Sparkles className="w-3 h-3 text-[#5B7147] opacity-60 group-hover:opacity-100 group-hover:rotate-12 transition-all ml-0.5" />
+          </button>
 
           {/* Mobile Menu Button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl bg-white border border-[#DDD3C2] text-[#435433] hover:bg-[#FAF8F4] shadow-sm transition-all"
+            className="lg:hidden p-2 rounded-xl bg-white border border-[#DDD3C2] text-[#435433] hover:bg-[#FAF8F4] shadow-sm transition-all cursor-pointer"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -1283,6 +1299,21 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {} }) {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Mobile View Splash Screen Action */}
+            <div className="pt-2 border-t border-[#F0EAE1]">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onShowSplash?.();
+                }}
+                className="w-full py-2.5 px-3 rounded-xl bg-[#5B7147]/10 hover:bg-[#5B7147]/15 text-[#435433] text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#5B7147]" />
+                <span>Replay Brand Welcome & Diagnostics</span>
+              </button>
             </div>
           </motion.div>
         )}

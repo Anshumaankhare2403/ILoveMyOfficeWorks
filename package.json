@@ -2,11 +2,18 @@
   "name": "my-office-works",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
+    "test": "node --test tests/**/*.test.js",
     "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
-    "install:all": "npm install && npm install --prefix client && npm install --prefix server"
+    "desktop:dev": "concurrently -k \"npm run dev --prefix client\" \"npm run dev --prefix desktop\"",
+    "desktop:start": "npm start --prefix desktop",
+    "desktop:build": "npm run build --prefix client && npm run dist --prefix desktop",
+    "desktop:portable": "npm run build --prefix client && npm run dist:portable --prefix desktop",
+    "desktop:pack": "npm run build --prefix client && npm run pack --prefix desktop",
+    "install:all": "npm install && npm install --prefix client && npm install --prefix server && npm install --prefix desktop"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

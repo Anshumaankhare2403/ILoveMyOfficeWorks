@@ -36,10 +36,11 @@ import {
   GitCompare,
   Search,
   Maximize2,
+  Images,
 } from 'lucide-react';
 import Uploader from './Uploader';
 
-export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {} }) {
+export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {}, onShowSplash }) {
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -391,6 +392,15 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
       accentColor: '#0D9488',
       tools: [
         {
+          id: 'merge-images',
+          name: 'Merge Images',
+          desc: 'Combine unlimited images (1,000+ supported) into a single PDF document or stitched continuous photo strip.',
+          badge: '1000+ Images',
+          icon: Images,
+          iconColor: 'bg-emerald-500/10 text-emerald-700 border-emerald-200/50',
+          count: fileCounts['merge-images'] || 0,
+        },
+        {
           id: 'compress-image',
           name: 'Compress Image',
           desc: 'Shrink JPG, PNG, and WebP images with smart Canvas re-encoding and quality downsampling.',
@@ -501,14 +511,19 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
           transition={{ duration: 0.4 }}
           className="flex justify-center"
         >
-          <div className="relative group">
-            <div className="absolute inset-0 bg-[#5B7147] rounded-3xl blur-xl opacity-20 group-hover:opacity-35 transition-opacity" />
+          <button
+            type="button"
+            onClick={onShowSplash}
+            className="relative group cursor-pointer focus:outline-hidden"
+            title="Click to view brand splash screen & system diagnostics"
+          >
+            <div className="absolute inset-0 bg-[#5B7147] rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="ILoveMyOfficeWorks Logo"
               className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover shadow-xl shadow-[#5B7147]/15 border border-[#DDD3C2] group-hover:scale-105 transition-transform"
             />
-          </div>
+          </button>
         </motion.div>
 
         <motion.div
@@ -758,6 +773,24 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Bottom Replay Splash Screen & Diagnostics Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white/70 border border-[#DDD3C2] text-xs text-[#5B6B50] shadow-xs">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-[#5B7147] shrink-0" />
+          <span>All 33 tools run entirely client-side with zero external telemetry or cloud storage.</span>
+        </div>
+        {onShowSplash && (
+          <button
+            type="button"
+            onClick={onShowSplash}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF8F4] border border-[#DDD3C2] text-[#435433] text-xs font-bold shadow-xs transition-colors cursor-pointer shrink-0"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#5B7147]" />
+            <span>Replay Splash Screen</span>
+          </button>
+        )}
       </div>
     </div>
   );

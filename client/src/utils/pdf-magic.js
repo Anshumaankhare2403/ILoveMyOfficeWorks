@@ -48,18 +48,6 @@ export async function inspectPdfFile(file) {
     );
 
   if (isImage) {
-    const arrayBuffer = await file.arrayBuffer();
-    let dimensions = null;
-    try {
-      if (typeof createImageBitmap === 'function') {
-        const bitmap = await createImageBitmap(new Blob([arrayBuffer]));
-        dimensions = { width: bitmap.width, height: bitmap.height };
-        bitmap.close?.();
-      }
-    } catch {
-      // Ignored if unsupported image format
-    }
-
     return {
       file,
       name: file.name,
@@ -67,10 +55,10 @@ export async function inspectPdfFile(file) {
       formattedSize: formatFileSize(file.size),
       pageCount: 1,
       isImage: true,
-      imageDimensions: dimensions,
+      imageDimensions: null,
       isEncrypted: false,
       error: null,
-      arrayBuffer,
+      arrayBuffer: null, // Lazy-loaded on demand during execution to support 1,000+ files safely
     };
   }
 
@@ -147,3 +135,45 @@ export async function inspectPdfFile(file) {
   }
 }
 
+/**
+ * Sanitize text strings before passing to pdf-lib standard fonts (Helvetica, TimesRoman, Courier)
+ * Standard fonts strictly encode in Windows-1252 (WinAnsi). Characters outside this charset
+ * (such as emojis, Asian scripts, non-WinAnsi symbols) will cause pdf-lib to throw an uncaught exception.
+ * This sanitizer maps common symbols to safe equivalents and replaces unencodable characters with '?'.
+ */
+export function sanitizeWinAnsiText(text) {
+  if (!text) return '';
+  const str = String(text);
+
+  // WinAnsi (Windows-1252) extension code points:
+  const winAnsiExtended = new Set([
+    0x20AC, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021, 0x02C6,
+    0x2030, 0x0160, 0x2039, 0x0152, 0x017D, 0x2018, 0x2019, 0x201C,
+    0x201D, 0x2022, 0x2013, 0x2014, 0x02DC, 0x2122, 0x0161, 0x203A,
+    0x0153, 0x017E, 0x0178,
+  ]);
+
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    // Standard ASCII printable & whitespaces + Latin-1 Supplement (0xA0-0xFF)
+    if (
+      (code >= 32 && code <= 126) ||
+      code === 10 ||
+      code === 13 ||
+      code === 9 ||
+      (code >= 0xA0 && code <= 0xFF)
+    ) {
+      result += str[i];
+    } else if (winAnsiExtended.has(code)) {
+      result += str[i];
+    } else {
+      // If surrogate pair (e.g. 4-byte emoji), skip trailing surrogate
+      if (code >= 0xD800 && code <= 0xDBFF && i + 1 < str.length) {
+        i++;
+      }
+      result += '?';
+    }
+  }
+  return result;
+}

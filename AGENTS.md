@@ -36,7 +36,7 @@ ILoveMyOfficeWorks/
 │       └── 04-ui-and-design-system.md
 ├── client/                            # React + Vite Frontend (Primary application)
 │   ├── src/
-│   │   ├── components/                # UI components (Navbar, HomeScreen, Uploader, etc.)
+│   │   ├── components/                # UI components (Navbar, HomeScreen, DesktopTitleBar, etc.)
 │   │   ├── registry/                  # Pluggable Tool Adapter Registry
 │   │   │   ├── registry.js            # Central adapter loader & dispatcher
 │   │   │   └── adapters/              # Individual tool adapters (merge, split, compress, docx)
@@ -47,6 +47,13 @@ ILoveMyOfficeWorks/
 │   │   ├── App.jsx                    # Root app state & tool routing
 │   │   └── index.css                  # Tailored tokens, typography, glassmorphism
 │   └── package.json
+├── desktop/                           # Windows Desktop Application (Electron.js)
+│   ├── assets/                        # Windows .ico and .png app icons
+│   ├── main.cjs                       # Electron main process (frameless window, IPC, dialogs)
+│   ├── preload.cjs                    # Secure contextBridge API for desktop features
+│   ├── electron-builder.json          # Windows installer (NSIS) and portable config
+│   ├── package.json                   # Desktop scripts & Electron dependencies
+│   └── README.md                      # Desktop setup and build guide
 └── server/                            # Optional Localhost Helper (Port 3001)
     └── server.js                      # Localhost Ghostscript bridge (optional)
 ```
@@ -59,11 +66,23 @@ ILoveMyOfficeWorks/
   ```bash
   npm run dev
   ```
+- **Run Windows Desktop App (Dev Mode with Live HMR):**
+  ```bash
+  npm run desktop:dev
+  ```
+- **Run Windows Desktop App (Production Bundle):**
+  ```bash
+  npm run desktop:start
+  ```
 - **Build Client for Production:**
   ```bash
   npm run build --prefix client
   ```
   *(Always run this command after making changes to verify 0 syntax or bundling errors).*
+- **Build Windows Executables (.exe / NSIS Installer / Portable):**
+  ```bash
+  npm run desktop:build
+  ```
 
 ---
 
