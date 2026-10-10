@@ -191,6 +191,8 @@ function loadProdDist() {
     path.join(__dirname, 'client', 'dist', 'index.html'),
     path.join(__dirname, '..', 'client', 'dist', 'index.html'),
     path.join(process.resourcesPath, 'client', 'dist', 'index.html'),
+    path.join(process.resourcesPath, 'app.asar', 'client', 'dist', 'index.html'),
+    path.join(process.resourcesPath, 'app', 'client', 'dist', 'index.html'),
   ];
 
   let foundPath = null;
