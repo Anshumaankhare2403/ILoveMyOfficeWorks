@@ -36,6 +36,7 @@ import {
   GitCompare,
   Grid,
   Maximize2,
+  Images,
 } from 'lucide-react';
 
 export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShowSplash }) {
@@ -370,6 +371,15 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
   // 7. Image Tools (from user request)
   const imageTools = [
     {
+      id: 'merge-images',
+      name: 'Merge Images',
+      desc: 'Combine unlimited images (1,000+ supported) into PDF or single photo',
+      badge: '1000+ Images',
+      icon: Images,
+      iconColor: 'text-emerald-700 bg-emerald-50 border-emerald-200/60',
+      count: fileCounts['merge-images'] || 0,
+    },
+    {
       id: 'compress-image',
       name: 'Compress Image',
       desc: 'Shrink JPG, PNG, and WebP with smart Canvas re-encoding',
@@ -477,7 +487,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                 ILoveMy<span className="text-[#5B7147]">OfficeWorks</span>
               </span>
               <span className="hidden xl:inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#435433] border border-[#5B7147]/20 whitespace-nowrap">
-                33 Tools
+                35 Tools
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-[#6B795D] font-medium hidden sm:block whitespace-nowrap">

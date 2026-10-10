@@ -48,18 +48,6 @@ export async function inspectPdfFile(file) {
     );
 
   if (isImage) {
-    const arrayBuffer = await file.arrayBuffer();
-    let dimensions = null;
-    try {
-      if (typeof createImageBitmap === 'function') {
-        const bitmap = await createImageBitmap(new Blob([arrayBuffer]));
-        dimensions = { width: bitmap.width, height: bitmap.height };
-        bitmap.close?.();
-      }
-    } catch {
-      // Ignored if unsupported image format
-    }
-
     return {
       file,
       name: file.name,
@@ -67,10 +55,10 @@ export async function inspectPdfFile(file) {
       formattedSize: formatFileSize(file.size),
       pageCount: 1,
       isImage: true,
-      imageDimensions: dimensions,
+      imageDimensions: null,
       isEncrypted: false,
       error: null,
-      arrayBuffer,
+      arrayBuffer: null, // Lazy-loaded on demand during execution to support 1,000+ files safely
     };
   }
 

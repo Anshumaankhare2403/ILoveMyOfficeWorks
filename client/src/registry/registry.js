@@ -41,6 +41,7 @@ import redactPdfAdapter from './adapters/redact-pdf.js';
 import comparePdfAdapter from './adapters/compare-pdf.js';
 
 // 7. Image Tools
+import mergeImagesAdapter from './adapters/merge-images.js';
 import compressImageAdapter from './adapters/compress-image.js';
 import resizeImageAdapter from './adapters/resize-image.js';
 import cropImageAdapter from './adapters/crop-image.js';
@@ -95,6 +96,7 @@ export const ADAPTER_REGISTRY = [
   comparePdfAdapter,
 
   // 7. Image Tools
+  mergeImagesAdapter,
   compressImageAdapter,
   resizeImageAdapter,
   cropImageAdapter,

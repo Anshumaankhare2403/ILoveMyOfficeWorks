@@ -5,11 +5,11 @@ import { loadTestPdf, createMockFileItem } from './test-utils.js';
 import { PDFDocument, PDFName, decodePDFRawStream } from '../client/node_modules/pdf-lib/cjs/index.js';
 
 describe('Adapter Registry Architecture & Contract Compliance', () => {
-  it('registers all 34 tool adapters without ID collisions', () => {
-    assert.equal(ADAPTER_REGISTRY.length, 34);
+  it('registers all 35 tool adapters without ID collisions', () => {
+    assert.equal(ADAPTER_REGISTRY.length, 35);
     const ids = ADAPTER_REGISTRY.map((a) => a.id);
     const uniqueIds = new Set(ids);
-    assert.equal(uniqueIds.size, 34, 'All tool adapter IDs must be completely unique');
+    assert.equal(uniqueIds.size, 35, 'All tool adapter IDs must be completely unique');
   });
 
   it('verifies that every adapter adheres to the base adapter specification contract', () => {
@@ -80,7 +80,7 @@ describe('Adapter Registry Architecture & Contract Compliance', () => {
     const pdfFile = loadTestPdf('sample_report.pdf');
     const adaptersStatus = getRegisteredAdapters([pdfFile]);
 
-    assert.equal(adaptersStatus.length, 34);
+    assert.equal(adaptersStatus.length, 35);
 
     // merge requires at least 2 files
     const mergeStatus = adaptersStatus.find((a) => a.id === 'merge-pdf');
@@ -90,6 +90,16 @@ describe('Adapter Registry Architecture & Contract Compliance', () => {
     // split requires at least 2 pages (sample_report has 3 pages) -> valid
     const splitStatus = adaptersStatus.find((a) => a.id === 'split-pdf');
     assert.equal(splitStatus.isValid, true);
+  });
+
+  it('validates merge-images adapter requirements and image queue acceptance', () => {
+    const mergeImages = ADAPTER_REGISTRY.find((a) => a.id === 'merge-images');
+    assert.ok(mergeImages, 'merge-images adapter must exist in registry');
+    assert.equal(mergeImages.accepts([]).valid, false);
+
+    const img1 = createMockFileItem({ name: 'photo1.jpg', isImage: true });
+    const img2 = createMockFileItem({ name: 'photo2.png', isImage: true });
+    assert.equal(mergeImages.accepts([img1, img2]).valid, true);
   });
 });
 

@@ -6,6 +6,7 @@ import { inspectPdfFile, MAX_FILE_SIZE } from '../utils/pdf-magic';
 
 export default function Uploader({ onFilesAdded, compact = false }) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [statusText, setStatusText] = useState('');
   const [errorNotice, setErrorNotice] = useState(null);
 
   const onDrop = async (acceptedFiles, rejectedFiles) => {
@@ -26,23 +27,38 @@ export default function Uploader({ onFilesAdded, compact = false }) {
     setIsProcessing(true);
     const validItems = [];
     const errors = [];
+    const total = acceptedFiles.length;
 
-    for (const file of acceptedFiles) {
-      try {
-        const inspected = await inspectPdfFile(file);
-        validItems.push({
-          id: `${file.name}-${file.lastModified}-${Math.random().toString(36).substring(2, 9)}`,
-          ...inspected,
-        });
-      } catch (err) {
-        errors.push(`${file.name}: ${err.message}`);
+    // Process in non-blocking batches of 50 for smooth 60fps UI with 1,000+ files
+    const batchSize = 50;
+    for (let i = 0; i < total; i += batchSize) {
+      const chunk = acceptedFiles.slice(i, i + batchSize);
+      for (const file of chunk) {
+        try {
+          const inspected = await inspectPdfFile(file);
+          validItems.push({
+            id: `${file.name}-${file.lastModified}-${Math.random().toString(36).substring(2, 9)}`,
+            ...inspected,
+          });
+        } catch (err) {
+          errors.push(`${file.name}: ${err.message}`);
+        }
+      }
+
+      if (total > batchSize) {
+        setStatusText(`Loading ${Math.min(i + batchSize, total)} of ${total} files...`);
+        await new Promise((r) => setTimeout(r, 0));
       }
     }
 
     setIsProcessing(false);
+    setStatusText('');
 
     if (errors.length > 0) {
-      setErrorNotice(errors.join(' | '));
+      setErrorNotice(
+        errors.slice(0, 3).join(' | ') +
+          (errors.length > 3 ? ` (+${errors.length - 3} more errors)` : '')
+      );
     }
 
     if (validItems.length > 0) {
@@ -83,7 +99,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
           <Plus className="w-5 h-5 text-[#5B7147]" />
         )}
         <span className="text-sm font-semibold">
-          {isProcessing ? 'Inspecting files...' : 'Add more files (PDF, images, documents)'}
+          {isProcessing ? (statusText || 'Inspecting files...') : 'Add more files (PDF, images, documents)'}
         </span>
       </div>
     );
@@ -117,10 +133,14 @@ export default function Uploader({ onFilesAdded, compact = false }) {
 
           <div>
             <h3 className="text-lg sm:text-xl font-bold text-[#262D20] tracking-tight">
-              {isDragActive ? 'Drop your files here' : 'Drop your documents or images here'}
+              {isProcessing
+                ? (statusText || 'Inspecting files...')
+                : isDragActive
+                ? 'Drop your files here'
+                : 'Drop your documents or images here'}
             </h3>
             <p className="text-xs sm:text-sm text-[#616D54] mt-1.5">
-              or click to browse from your computer • Unlimited files supported
+              or click to browse from your computer • Unlimited 1,000+ files supported
             </p>
           </div>
 

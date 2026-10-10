@@ -36,6 +36,7 @@ import {
   GitCompare,
   Search,
   Maximize2,
+  Images,
 } from 'lucide-react';
 import Uploader from './Uploader';
 
@@ -390,6 +391,15 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
       headerBg: 'from-teal-50 to-emerald-50/50 border-teal-200/60',
       accentColor: '#0D9488',
       tools: [
+        {
+          id: 'merge-images',
+          name: 'Merge Images',
+          desc: 'Combine unlimited images (1,000+ supported) into a single PDF document or stitched continuous photo strip.',
+          badge: '1000+ Images',
+          icon: Images,
+          iconColor: 'bg-emerald-500/10 text-emerald-700 border-emerald-200/50',
+          count: fileCounts['merge-images'] || 0,
+        },
         {
           id: 'compress-image',
           name: 'Compress Image',
