@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { sanitizeWinAnsiText } from '../../utils/pdf-magic.js';
 
 const editPdfAdapter = {
   id: 'edit-pdf',
@@ -82,7 +83,7 @@ const editPdfAdapter = {
     const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
     const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const pages = pdfDoc.getPages();
-    const text = (options.annotationText || 'APPROVED').trim();
+    const text = sanitizeWinAnsiText((options.annotationText || 'APPROVED').trim());
     const fontSize = parseInt(options.fontSize || '14', 10);
     const position = options.position || 'top-right';
     const showBox = options.showBox !== 'false';

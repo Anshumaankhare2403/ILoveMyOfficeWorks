@@ -1,4 +1,4 @@
-import { convertPdfToDocx } from '../../utils/pdf-to-docx-engine';
+import { convertPdfToDocx } from '../../utils/pdf-to-docx-engine.js';
 
 const pdfToDocxAdapter = {
   id: 'pdf-to-docx',

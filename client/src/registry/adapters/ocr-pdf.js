@@ -1,10 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-}
+import { pdfjsLib } from '../../utils/pdfjs-init.js';
+import { sanitizeWinAnsiText } from '../../utils/pdf-magic.js';
 
 const ocrPdfAdapter = {
   id: 'ocr-pdf',
@@ -65,36 +61,41 @@ const ocrPdfAdapter = {
       }
     }
 
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(arrayBuffer.slice(0)),
-      cMapUrl: '/cmaps/',
-      cMapPacked: true,
-      standardFontDataUrl: '/standard_fonts/',
-    });
-
-    const pdf = await loadingTask.promise;
-    const numPages = pdf.numPages;
-
+    let pdf = null;
     const extractedTextByPage = [];
 
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const percent = Math.round(15 + (pageNum / numPages) * 60);
-      onProgress(percent, `Extracting and recognizing text on page ${pageNum} of ${numPages}...`);
+    try {
+      const loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(arrayBuffer.slice(0)),
+        cMapUrl: '/cmaps/',
+        cMapPacked: true,
+        standardFontDataUrl: '/standard_fonts/',
+      });
 
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const items = textContent.items || [];
+      pdf = await loadingTask.promise;
+      const numPages = pdf.numPages;
 
-      const pageStrings = items
-        .filter((it) => it.str && it.str.trim())
-        .map((it) => ({
-          text: it.str,
-          x: it.transform[4],
-          y: it.transform[5],
-          fontSize: Math.sqrt(it.transform[0] * it.transform[0] + it.transform[1] * it.transform[1]) || 10,
-        }));
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const percent = Math.round(15 + (pageNum / numPages) * 60);
+        onProgress(percent, `Extracting and recognizing text on page ${pageNum} of ${numPages}...`);
 
-      extractedTextByPage.push(pageStrings);
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const items = textContent.items || [];
+
+        const pageStrings = items
+          .filter((it) => it.str && it.str.trim())
+          .map((it) => ({
+            text: sanitizeWinAnsiText(it.str),
+            x: it.transform[4],
+            y: it.transform[5],
+            fontSize: Math.sqrt(it.transform[0] * it.transform[0] + it.transform[1] * it.transform[1]) || 10,
+          }));
+
+        extractedTextByPage.push(pageStrings);
+      }
+    } finally {
+      try { await pdf?.destroy(); } catch {}
     }
 
     const rawName = targetFile.name || 'document.pdf';

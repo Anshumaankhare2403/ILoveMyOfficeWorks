@@ -1,4 +1,4 @@
-import { compressPdfWithMasterPipeline } from '../../utils/pdf-compressor-engine';
+import { compressPdfWithMasterPipeline } from '../../utils/pdf-compressor-engine.js';
 
 const compressPdfAdapter = {
   id: 'compress-pdf',

@@ -2,7 +2,9 @@
   "name": "my-office-works",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
+    "test": "node --test tests/**/*.test.js",
     "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",

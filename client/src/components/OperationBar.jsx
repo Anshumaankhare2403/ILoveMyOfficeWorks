@@ -350,15 +350,16 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                             max={opt.max}
                             value={adapterOptions[opt.id] ?? opt.default}
                             placeholder={
-                              opt.id === 'outputFilename'
+                              opt.placeholder ||
+                              (opt.id === 'outputFilename'
                                 ? activeAdapter?.id === 'compress-pdf'
-                                  ? `${files[0]?.name?.replace(/\.pdf$/i, '') || 'document'}_compressed.pdf`
+                                  ? `${files[0]?.name?.replace(/\.[^/.]+$/, '') || 'document'}_compressed.pdf`
                                   : activeAdapter?.id === 'pdf-to-docx'
-                                  ? `${files[0]?.name?.replace(/\.pdf$/i, '') || 'document'}.docx`
+                                  ? `${files[0]?.name?.replace(/\.[^/.]+$/, '') || 'document'}.docx`
                                   : activeAdapter?.id === 'split-pdf'
                                   ? 'split_part'
-                                  : 'merged-document.pdf'
-                                : opt.placeholder || ''
+                                  : `${files[0]?.name?.replace(/\.[^/.]+$/, '') || 'document'}_processed.pdf`
+                                : '')
                             }
                             onChange={(e) => handleOptionChange(opt.id, e.target.value)}
                             disabled={isExecuting}

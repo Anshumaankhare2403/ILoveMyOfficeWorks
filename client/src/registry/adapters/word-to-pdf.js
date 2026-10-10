@@ -1,5 +1,6 @@
 import { PDFDocument, PageSizes, StandardFonts, rgb } from 'pdf-lib';
 import JSZip from 'jszip';
+import { sanitizeWinAnsiText } from '../../utils/pdf-magic.js';
 
 /**
  * Extract paragraphs and text from .docx XML using JSZip
@@ -132,7 +133,7 @@ const wordToPdfAdapter = {
       const fontSize = p.isHeading ? 14 : 11;
       const lineHeight = fontSize * 1.35;
 
-      const words = p.text.split(/\s+/);
+      const words = sanitizeWinAnsiText(p.text).split(/\s+/);
       let line = '';
 
       for (const word of words) {

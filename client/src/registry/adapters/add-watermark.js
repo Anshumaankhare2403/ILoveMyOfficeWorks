@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
+import { sanitizeWinAnsiText } from '../../utils/pdf-magic.js';
 
 const addWatermarkAdapter = {
   id: 'add-watermark',
@@ -82,7 +83,7 @@ const addWatermarkAdapter = {
     const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
     const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const pages = pdfDoc.getPages();
-    const text = (options.watermarkText || 'CONFIDENTIAL').trim();
+    const text = sanitizeWinAnsiText((options.watermarkText || 'CONFIDENTIAL').trim());
     const angle = parseInt(options.angle || '45', 10);
     const opacity = parseFloat(options.opacity || '0.25');
     const fontSize = parseInt(options.fontSize || '54', 10);

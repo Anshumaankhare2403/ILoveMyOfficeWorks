@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { sanitizeWinAnsiText } from '../../utils/pdf-magic.js';
 
 const signPdfAdapter = {
   id: 'sign-pdf',
@@ -76,8 +77,8 @@ const signPdfAdapter = {
     const pages = pdfDoc.getPages();
     const totalPages = pages.length;
 
-    const signerName = (options.signerName || 'Authorized Signer').trim();
-    const reasonText =
+    const signerName = sanitizeWinAnsiText((options.signerName || 'Authorized Signer').trim());
+    const rawReason =
       options.signReason === 'authored'
         ? 'Author of document'
         : options.signReason === 'verified'
@@ -85,6 +86,7 @@ const signPdfAdapter = {
         : options.signReason === 'acknowledged'
         ? 'Acknowledged & Received'
         : 'Approved & Signed';
+    const reasonText = sanitizeWinAnsiText(rawReason);
 
     const now = new Date();
     const dateStr = now.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';

@@ -1,5 +1,4 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { pdfjsLib } from './pdfjs-init.js';
 import {
   Document,
   Paragraph,
@@ -15,11 +14,6 @@ import {
   ImageRun,
   Packer,
 } from 'docx';
-
-// Initialize PDF.js worker URL for Vite
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-}
 
 /**
  * Clean and normalize text strings for OpenXML Word standards

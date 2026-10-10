@@ -1,11 +1,5 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { pdfjsLib } from '../../utils/pdfjs-init.js';
 import JSZip from 'jszip';
-
-// Initialize PDF.js worker URL for Vite
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-}
 
 const pdfToJpgAdapter = {
   id: 'pdf-to-jpg',
@@ -80,57 +74,55 @@ const pdfToJpgAdapter = {
       }
     }
 
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(arrayBuffer.slice(0)),
-      cMapUrl: '/cmaps/',
-      cMapPacked: true,
-      standardFontDataUrl: '/standard_fonts/',
-    });
-
-    const pdf = await loadingTask.promise;
-    const numPages = pdf.numPages;
-
-    const dpi = parseInt(options.resolution || '150', 10);
-    // Standard PDF is 72 DPI base scale
-    const scale = dpi / 72;
-    const format = options.format || 'image/jpeg';
-    const ext = format === 'image/png' ? 'png' : 'jpg';
-    const baseName = targetItem.name.replace(/\.[^/.]+$/, '');
-
+    let pdf = null;
     const renderedImages = [];
 
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const percent = Math.round(10 + (pageNum / numPages) * 75);
-      onProgress(percent, `Rendering page ${pageNum} of ${numPages} at ${dpi} DPI...`);
-
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.floor(viewport.width);
-      canvas.height = Math.floor(viewport.height);
-      const ctx = canvas.getContext('2d', { alpha: false });
-
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      await page.render({
-        canvasContext: ctx,
-        viewport,
-        intent: 'print',
-      }).promise;
-
-      const blob = await new Promise((resolve) =>
-        canvas.toBlob(resolve, format, 0.92)
-      );
-
-      canvas.width = 0;
-      canvas.height = 0;
-
-      renderedImages.push({
-        name: `${baseName}_page_${String(pageNum).padStart(3, '0')}.${ext}`,
-        blob,
+    try {
+      const loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(arrayBuffer.slice(0)),
+        cMapUrl: '/cmaps/',
+        cMapPacked: true,
+        standardFontDataUrl: '/standard_fonts/',
       });
+
+      pdf = await loadingTask.promise;
+      const numPages = pdf.numPages;
+
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const percent = Math.round(10 + (pageNum / numPages) * 75);
+        onProgress(percent, `Rendering page ${pageNum} of ${numPages} at ${dpi} DPI...`);
+
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        await page.render({
+          canvasContext: ctx,
+          viewport,
+          intent: 'print',
+        }).promise;
+
+        const blob = await new Promise((resolve) =>
+          canvas.toBlob(resolve, format, 0.92)
+        );
+
+        canvas.width = 0;
+        canvas.height = 0;
+
+        renderedImages.push({
+          name: `${baseName}_page_${String(pageNum).padStart(3, '0')}.${ext}`,
+          blob,
+        });
+      }
+    } finally {
+      try { await pdf?.destroy(); } catch {}
     }
 
     onProgress(90, 'Packaging image output...');

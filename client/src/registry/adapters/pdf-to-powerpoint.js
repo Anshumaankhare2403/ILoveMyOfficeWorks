@@ -1,10 +1,5 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { pdfjsLib } from '../../utils/pdfjs-init.js';
 import JSZip from 'jszip';
-
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-}
 
 /**
  * Builds a valid OpenXML .pptx presentation with embedded slide images

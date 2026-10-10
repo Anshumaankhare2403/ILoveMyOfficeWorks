@@ -1,4 +1,5 @@
 import { PDFDocument, PageSizes, StandardFonts, rgb } from 'pdf-lib';
+import { sanitizeWinAnsiText } from '../../utils/pdf-magic.js';
 
 /**
  * Parse CSV or plain text table rows
@@ -159,7 +160,7 @@ const excelToPdfAdapter = {
       }
 
       for (let cIdx = 0; cIdx < row.length; cIdx++) {
-        const cellText = row[cIdx] || '';
+        const cellText = sanitizeWinAnsiText(row[cIdx] || '');
         const x = margin + cIdx * colWidth;
         const currentFont = isHeader ? fontBold : font;
         const fontSize = 9;

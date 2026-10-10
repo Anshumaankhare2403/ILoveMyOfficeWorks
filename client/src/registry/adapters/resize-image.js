@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import { formatFileSize } from '../../utils/pdf-magic';
+import { formatFileSize } from '../../utils/pdf-magic.js';
 
 function loadImage(file) {
   return new Promise((resolve, reject) => {
