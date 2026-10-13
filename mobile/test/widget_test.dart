@@ -7,9 +7,11 @@ void main() {
     final serverService = LocalServerService();
     await tester.pumpWidget(ILoveMyOfficeWorksApp(serverService: serverService));
 
-    // Verify Android badge and buttons are rendered
-    expect(find.text('ANDROID'), findsOneWidget);
-    expect(find.text('Merge PDFs'), findsOneWidget);
-    expect(find.text('Open Full Studio'), findsOneWidget);
+    // Verify web engine container and bottom navigation destinations are rendered
+    expect(find.text('ILoveMyOfficeWorks Web Engine'), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Saved Files'), findsOneWidget);
+    expect(find.text('Studio'), findsOneWidget);
+    expect(find.text('Privacy'), findsOneWidget);
   });
 }

@@ -152,25 +152,44 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
     }
 
     // Support native Android file saving via FlutterBridge
-    if (typeof window !== 'undefined' && window.FlutterBridge && executionResult?.blob) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Data = (reader.result || '').split(',')[1];
-        if (base64Data) {
-          window.FlutterBridge.postMessage(
-            JSON.stringify({
-              type: 'DOWNLOAD_FILE',
-              filename: downloadName,
-              base64Data: base64Data,
-              mimeType: executionResult.blob.type || 'application/octet-stream',
-            })
-          );
-        }
-      };
-      reader.readAsDataURL(executionResult.blob);
+    if (typeof window !== 'undefined' && window.FlutterBridge) {
+      const getBlobPromise = (url && url !== executionResult?.downloadUrl)
+        ? fetch(url).then((r) => r.blob())
+        : Promise.resolve(executionResult?.blob);
+
+      getBlobPromise
+        .then((blob) => {
+          if (!blob) {
+            _doAnchorDownload(downloadUrl, downloadName);
+            return;
+          }
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Data = (reader.result || '').split(',')[1];
+            if (base64Data) {
+              window.FlutterBridge.postMessage(
+                JSON.stringify({
+                  type: 'DOWNLOAD_FILE',
+                  filename: downloadName,
+                  base64Data: base64Data,
+                  mimeType: blob.type || 'application/octet-stream',
+                  toolName: activeAdapter?.name,
+                })
+              );
+            }
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(() => {
+          _doAnchorDownload(downloadUrl, downloadName);
+        });
       return;
     }
 
+    _doAnchorDownload(downloadUrl, downloadName);
+  };
+
+  const _doAnchorDownload = (downloadUrl, downloadName) => {
     const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = downloadName;

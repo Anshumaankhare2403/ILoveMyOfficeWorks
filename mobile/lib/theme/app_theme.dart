@@ -83,6 +83,61 @@ class AppTheme {
           ),
         ),
       ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: creamBg,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: borderLight, width: 1),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: creamBg,
+        surfaceTintColor: Colors.transparent,
+        modalBackgroundColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: Colors.white,
+        indicatorColor: sageTint,
+        elevation: 0,
+        height: 64,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              color: primarySage,
+              overflow: TextOverflow.ellipsis,
+            );
+          }
+          return const TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w500,
+            color: textSecondary,
+            overflow: TextOverflow.ellipsis,
+          );
+        }),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderLight),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderLight),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primarySage, width: 1.5),
+        ),
+      ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: forestDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

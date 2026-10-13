@@ -204,6 +204,10 @@ function MainApp() {
   useEffect(() => {
     try {
       const searchParams = new URLSearchParams(window.location.search);
+      const isMobile = searchParams.get('mobile') === 'true' || (typeof window !== 'undefined' && (window.isMobileApp || window.FlutterBridge));
+      if (isMobile) {
+        setShowSplash(false);
+      }
       const urlTool = searchParams.get('tool') || window.location.hash.replace('#', '').replace('tool=', '');
       if (urlTool && TOOL_CONFIGS[urlTool]) {
         setActiveTab(urlTool);
@@ -213,6 +217,11 @@ function MainApp() {
       // ignore
     }
 
+    window.setAppTab = (tab) => {
+      setActiveTab(tab);
+    };
+    window.getAppTab = () => activeTab;
+
     const handleFlutterFiles = (e) => {
       const rawFiles = e.detail;
       if (rawFiles && rawFiles.length > 0) {
@@ -220,8 +229,12 @@ function MainApp() {
       }
     };
     window.addEventListener('flutter-files-received', handleFlutterFiles);
-    return () => window.removeEventListener('flutter-files-received', handleFlutterFiles);
-  }, []);
+    return () => {
+      window.removeEventListener('flutter-files-received', handleFlutterFiles);
+      delete window.setAppTab;
+      delete window.getAppTab;
+    };
+  }, [activeTab]);
 
   const [queuePage, setQueuePage] = useState(1);
   const PAGE_SIZE = 30;

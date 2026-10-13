@@ -487,7 +487,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                 ILoveMy<span className="text-[#5B7147]">OfficeWorks</span>
               </span>
               <span className="hidden xl:inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#435433] border border-[#5B7147]/20 whitespace-nowrap">
-                35 Tools
+                33 Tools
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-[#6B795D] font-medium hidden sm:block whitespace-nowrap">
@@ -506,19 +506,17 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
             <button
               type="button"
               onClick={() => setOpenDropdown(openDropdown === 'organize' ? null : 'organize')}
-              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
-                hasActiveTool(organizeTools)
-                  ? 'bg-[#5B7147] text-white shadow-sm'
-                  : openDropdown === 'organize'
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${hasActiveTool(organizeTools)
+                ? 'bg-[#5B7147] text-white shadow-sm'
+                : openDropdown === 'organize'
                   ? 'bg-white text-[#1E2619] shadow-sm'
                   : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
-              }`}
+                }`}
             >
               <span>Organize</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                  openDropdown === 'organize' ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${openDropdown === 'organize' ? 'rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -548,26 +546,23 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           key={tool.id}
                           type="button"
                           onClick={() => handleSelectTool(tool.id)}
-                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${
-                            active
-                              ? 'bg-[#5B7147] text-white font-bold'
-                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
-                          }`}
+                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${active
+                            ? 'bg-[#5B7147] text-white font-bold'
+                            : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                            }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
-                                active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                              }`}
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                }`}
                             >
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
                               <span className="text-xs font-bold truncate block">{tool.name}</span>
                               <span
-                                className={`text-[10px] truncate block ${
-                                  active ? 'text-white/80' : 'text-[#78856B]'
-                                }`}
+                                className={`text-[10px] truncate block ${active ? 'text-white/80' : 'text-[#78856B]'
+                                  }`}
                               >
                                 {tool.desc}
                               </span>
@@ -575,9 +570,8 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           </div>
                           {tool.count > 0 && (
                             <span
-                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${
-                                active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
-                              }`}
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
+                                }`}
                             >
                               {tool.count}
                             </span>
@@ -599,19 +593,17 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
             <button
               type="button"
               onClick={() => setOpenDropdown(openDropdown === 'optimize' ? null : 'optimize')}
-              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
-                hasActiveTool(optimizeTools)
-                  ? 'bg-[#5B7147] text-white shadow-sm'
-                  : openDropdown === 'optimize'
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${hasActiveTool(optimizeTools)
+                ? 'bg-[#5B7147] text-white shadow-sm'
+                : openDropdown === 'optimize'
                   ? 'bg-white text-[#1E2619] shadow-sm'
                   : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
-              }`}
+                }`}
             >
               <span>Optimize</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                  openDropdown === 'optimize' ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${openDropdown === 'optimize' ? 'rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -641,26 +633,23 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           key={tool.id}
                           type="button"
                           onClick={() => handleSelectTool(tool.id)}
-                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${
-                            active
-                              ? 'bg-[#5B7147] text-white font-bold'
-                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
-                          }`}
+                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${active
+                            ? 'bg-[#5B7147] text-white font-bold'
+                            : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                            }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
-                                active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                              }`}
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                }`}
                             >
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
                               <span className="text-xs font-bold truncate block">{tool.name}</span>
                               <span
-                                className={`text-[10px] truncate block ${
-                                  active ? 'text-white/80' : 'text-[#78856B]'
-                                }`}
+                                className={`text-[10px] truncate block ${active ? 'text-white/80' : 'text-[#78856B]'
+                                  }`}
                               >
                                 {tool.desc}
                               </span>
@@ -668,9 +657,8 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           </div>
                           {tool.count > 0 && (
                             <span
-                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${
-                                active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
-                              }`}
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
+                                }`}
                             >
                               {tool.count}
                             </span>
@@ -692,19 +680,17 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
             <button
               type="button"
               onClick={() => setOpenDropdown(openDropdown === 'convert' ? null : 'convert')}
-              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
-                hasActiveTool([...convertToPdfTools, ...convertFromPdfTools])
-                  ? 'bg-[#5B7147] text-white shadow-sm'
-                  : openDropdown === 'convert'
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${hasActiveTool([...convertToPdfTools, ...convertFromPdfTools])
+                ? 'bg-[#5B7147] text-white shadow-sm'
+                : openDropdown === 'convert'
                   ? 'bg-white text-[#1E2619] shadow-sm'
                   : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
-              }`}
+                }`}
             >
               <span>Convert</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                  openDropdown === 'convert' ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${openDropdown === 'convert' ? 'rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -733,28 +719,25 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                             key={tool.id}
                             type="button"
                             onClick={() => handleSelectTool(tool.id)}
-                            className={`w-full text-left p-1.5 rounded-xl transition-all flex items-center justify-between gap-2 ${
-                              active
-                                ? 'bg-[#5B7147] text-white font-bold'
-                                : 'hover:bg-[#FAF8F4] text-[#262D20]'
-                            }`}
+                            className={`w-full text-left p-1.5 rounded-xl transition-all flex items-center justify-between gap-2 ${active
+                              ? 'bg-[#5B7147] text-white font-bold'
+                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                              }`}
                           >
                             <div className="flex items-center gap-2 min-w-0">
                               <div
-                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
-                                  active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                                }`}
+                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                  }`}
                               >
                                 <Icon className="w-3.5 h-3.5" />
                               </div>
                               <span className="text-xs font-bold truncate">{tool.name}</span>
                             </div>
                             <span
-                              className={`text-[9px] font-mono px-1 py-0.2 rounded ${
-                                active
-                                  ? 'bg-white/20 text-white'
-                                  : 'bg-stone-100 text-stone-600'
-                              }`}
+                              className={`text-[9px] font-mono px-1 py-0.2 rounded ${active
+                                ? 'bg-white/20 text-white'
+                                : 'bg-stone-100 text-stone-600'
+                                }`}
                             >
                               {tool.badge}
                             </span>
@@ -780,28 +763,25 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                             key={tool.id}
                             type="button"
                             onClick={() => handleSelectTool(tool.id)}
-                            className={`w-full text-left p-1.5 rounded-xl transition-all flex items-center justify-between gap-2 ${
-                              active
-                                ? 'bg-[#5B7147] text-white font-bold'
-                                : 'hover:bg-[#FAF8F4] text-[#262D20]'
-                            }`}
+                            className={`w-full text-left p-1.5 rounded-xl transition-all flex items-center justify-between gap-2 ${active
+                              ? 'bg-[#5B7147] text-white font-bold'
+                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                              }`}
                           >
                             <div className="flex items-center gap-2 min-w-0">
                               <div
-                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
-                                  active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                                }`}
+                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                  }`}
                               >
                                 <Icon className="w-3.5 h-3.5" />
                               </div>
                               <span className="text-xs font-bold truncate">{tool.name}</span>
                             </div>
                             <span
-                              className={`text-[9px] font-mono px-1 py-0.2 rounded ${
-                                active
-                                  ? 'bg-white/20 text-white'
-                                  : 'bg-stone-100 text-stone-600'
-                              }`}
+                              className={`text-[9px] font-mono px-1 py-0.2 rounded ${active
+                                ? 'bg-white/20 text-white'
+                                : 'bg-stone-100 text-stone-600'
+                                }`}
                             >
                               {tool.badge}
                             </span>
@@ -823,19 +803,17 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
             <button
               type="button"
               onClick={() => setOpenDropdown(openDropdown === 'edit' ? null : 'edit')}
-              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
-                hasActiveTool(editTools)
-                  ? 'bg-[#5B7147] text-white shadow-sm'
-                  : openDropdown === 'edit'
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${hasActiveTool(editTools)
+                ? 'bg-[#5B7147] text-white shadow-sm'
+                : openDropdown === 'edit'
                   ? 'bg-white text-[#1E2619] shadow-sm'
                   : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
-              }`}
+                }`}
             >
               <span>Edit</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                  openDropdown === 'edit' ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${openDropdown === 'edit' ? 'rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -865,26 +843,23 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           key={tool.id}
                           type="button"
                           onClick={() => handleSelectTool(tool.id)}
-                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${
-                            active
-                              ? 'bg-[#5B7147] text-white font-bold'
-                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
-                          }`}
+                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${active
+                            ? 'bg-[#5B7147] text-white font-bold'
+                            : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                            }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
-                                active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                              }`}
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                }`}
                             >
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
                               <span className="text-xs font-bold truncate block">{tool.name}</span>
                               <span
-                                className={`text-[10px] truncate block ${
-                                  active ? 'text-white/80' : 'text-[#78856B]'
-                                }`}
+                                className={`text-[10px] truncate block ${active ? 'text-white/80' : 'text-[#78856B]'
+                                  }`}
                               >
                                 {tool.desc}
                               </span>
@@ -892,9 +867,8 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           </div>
                           {tool.count > 0 && (
                             <span
-                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${
-                                active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
-                              }`}
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
+                                }`}
                             >
                               {tool.count}
                             </span>
@@ -916,19 +890,17 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
             <button
               type="button"
               onClick={() => setOpenDropdown(openDropdown === 'security' ? null : 'security')}
-              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
-                hasActiveTool(securityTools)
-                  ? 'bg-[#5B7147] text-white shadow-sm'
-                  : openDropdown === 'security'
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${hasActiveTool(securityTools)
+                ? 'bg-[#5B7147] text-white shadow-sm'
+                : openDropdown === 'security'
                   ? 'bg-white text-[#1E2619] shadow-sm'
                   : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
-              }`}
+                }`}
             >
               <span>Security</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                  openDropdown === 'security' ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${openDropdown === 'security' ? 'rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -958,26 +930,23 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           key={tool.id}
                           type="button"
                           onClick={() => handleSelectTool(tool.id)}
-                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${
-                            active
-                              ? 'bg-[#5B7147] text-white font-bold'
-                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
-                          }`}
+                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${active
+                            ? 'bg-[#5B7147] text-white font-bold'
+                            : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                            }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
-                                active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                              }`}
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                }`}
                             >
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
                               <span className="text-xs font-bold truncate block">{tool.name}</span>
                               <span
-                                className={`text-[10px] truncate block ${
-                                  active ? 'text-white/80' : 'text-[#78856B]'
-                                }`}
+                                className={`text-[10px] truncate block ${active ? 'text-white/80' : 'text-[#78856B]'
+                                  }`}
                               >
                                 {tool.desc}
                               </span>
@@ -985,9 +954,8 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           </div>
                           {tool.count > 0 && (
                             <span
-                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${
-                                active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
-                              }`}
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
+                                }`}
                             >
                               {tool.count}
                             </span>
@@ -1009,19 +977,17 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
             <button
               type="button"
               onClick={() => setOpenDropdown(openDropdown === 'image' ? null : 'image')}
-              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
-                hasActiveTool(imageTools)
-                  ? 'bg-[#5B7147] text-white shadow-sm'
-                  : openDropdown === 'image'
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${hasActiveTool(imageTools)
+                ? 'bg-[#5B7147] text-white shadow-sm'
+                : openDropdown === 'image'
                   ? 'bg-white text-[#1E2619] shadow-sm'
                   : 'text-[#414E38] hover:text-[#1E2619] hover:bg-white/80'
-              }`}
+                }`}
             >
               <span>Image</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                  openDropdown === 'image' ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${openDropdown === 'image' ? 'rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -1052,26 +1018,23 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           key={tool.id}
                           type="button"
                           onClick={() => handleSelectTool(tool.id)}
-                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${
-                            active
-                              ? 'bg-[#5B7147] text-white font-bold'
-                              : 'hover:bg-[#FAF8F4] text-[#262D20]'
-                          }`}
+                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2.5 ${active
+                            ? 'bg-[#5B7147] text-white font-bold'
+                            : 'hover:bg-[#FAF8F4] text-[#262D20]'
+                            }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
-                                active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                              }`}
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                }`}
                             >
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
                               <span className="text-xs font-bold truncate block">{tool.name}</span>
                               <span
-                                className={`text-[10px] truncate block ${
-                                  active ? 'text-white/80' : 'text-[#78856B]'
-                                }`}
+                                className={`text-[10px] truncate block ${active ? 'text-white/80' : 'text-[#78856B]'
+                                  }`}
                               >
                                 {tool.desc}
                               </span>
@@ -1079,9 +1042,8 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                           </div>
                           {tool.count > 0 && (
                             <span
-                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${
-                                active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
-                              }`}
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-[#5B7147]/15 text-[#3D4C2B]'
+                                }`}
                             >
                               {tool.count}
                             </span>
@@ -1103,18 +1065,16 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
             <button
               type="button"
               onClick={() => setOpenDropdown(openDropdown === 'allTools' ? null : 'allTools')}
-              className={`px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap border ${
-                openDropdown === 'allTools'
-                  ? 'bg-[#5B7147] text-white border-[#5B7147] shadow-sm'
-                  : 'bg-[#EDE7DC]/80 hover:bg-[#E5DDD0] text-[#262D20] border-[#DDD3C2]'
-              }`}
+              className={`px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap border ${openDropdown === 'allTools'
+                ? 'bg-[#5B7147] text-white border-[#5B7147] shadow-sm'
+                : 'bg-[#EDE7DC]/80 hover:bg-[#E5DDD0] text-[#262D20] border-[#DDD3C2]'
+                }`}
             >
               <Grid className="w-3.5 h-3.5 text-[#5B7147]" />
               <span>All Tools</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                  openDropdown === 'allTools' ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-150 ${openDropdown === 'allTools' ? 'rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -1156,16 +1116,14 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                                 key={tool.id}
                                 type="button"
                                 onClick={() => handleSelectTool(tool.id)}
-                                className={`w-full text-left py-1.5 px-2 rounded-lg transition-all flex items-center gap-2 group ${
-                                  active
-                                    ? 'bg-[#5B7147] text-white font-bold'
-                                    : 'hover:bg-[#FAF8F4] text-[#2E3827]'
-                                }`}
+                                className={`w-full text-left py-1.5 px-2 rounded-lg transition-all flex items-center gap-2 group ${active
+                                  ? 'bg-[#5B7147] text-white font-bold'
+                                  : 'hover:bg-[#FAF8F4] text-[#2E3827]'
+                                  }`}
                               >
                                 <div
-                                  className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 border ${
-                                    active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
-                                  }`}
+                                  className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 border ${active ? 'bg-white/20 text-white border-white/30' : tool.iconColor
+                                    }`}
                                 >
                                   <Icon className="w-3 h-3" />
                                 </div>
@@ -1238,18 +1196,16 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                       onClick={() =>
                         setMobileSectionOpen(isExpanded ? null : section.id)
                       }
-                      className={`w-full px-3.5 py-3 flex items-center justify-between text-xs font-bold transition-colors ${
-                        hasActive ? 'bg-[#5B7147]/10 text-[#435433]' : 'text-[#262D20]'
-                      }`}
+                      className={`w-full px-3.5 py-3 flex items-center justify-between text-xs font-bold transition-colors ${hasActive ? 'bg-[#5B7147]/10 text-[#435433]' : 'text-[#262D20]'
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         <SectionIcon className="w-4 h-4 text-[#5B7147]" />
                         <span>{section.label}</span>
                       </div>
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          isExpanded ? 'rotate-180' : ''
-                        }`}
+                        className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
 
@@ -1264,17 +1220,15 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                               key={item.id}
                               type="button"
                               onClick={() => handleSelectTool(item.id)}
-                              className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between gap-2.5 ${
-                                active
-                                  ? 'bg-[#5B7147] text-white font-bold'
-                                  : 'hover:bg-white text-[#262D20]'
-                              }`}
+                              className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between gap-2.5 ${active
+                                ? 'bg-[#5B7147] text-white font-bold'
+                                : 'hover:bg-white text-[#262D20]'
+                                }`}
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
                                 <div
-                                  className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                                    active ? 'bg-white/20 text-white' : item.iconColor
-                                  }`}
+                                  className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${active ? 'bg-white/20 text-white' : item.iconColor
+                                    }`}
                                 >
                                   <Icon className="w-3.5 h-3.5" />
                                 </div>
@@ -1282,11 +1236,10 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                               </div>
                               {item.count > 0 && (
                                 <span
-                                  className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full ${
-                                    active
-                                      ? 'bg-white/20 text-white'
-                                      : 'bg-[#5B7147]/15 text-[#3D4C2B]'
-                                  }`}
+                                  className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full ${active
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-[#5B7147]/15 text-[#3D4C2B]'
+                                    }`}
                                 >
                                   {item.count}
                                 </span>

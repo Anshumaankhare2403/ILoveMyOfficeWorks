@@ -47,3 +47,32 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+// Automatically create branded APK copy with app name and version on release builds
+tasks.register("packageBrandedReleaseApk") {
+    doLast {
+        val vName = flutter.versionName ?: "0.5.6"
+        val brandedName = "ILoveMyOfficeWorks-v$vName.apk"
+
+        val agpDir = layout.buildDirectory.dir("outputs/apk/release").get().asFile
+        val agpApk = File(agpDir, "app-release.apk")
+        if (agpApk.exists()) {
+            val dest = File(agpDir, brandedName)
+            agpApk.copyTo(dest, overwrite = true)
+            println("🏷️ [Branded AGP APK]: Created ${dest.name} in ${agpDir.path}")
+        }
+
+        val flutterDir = layout.buildDirectory.dir("outputs/flutter-apk").get().asFile
+        val flutterApk = File(flutterDir, "app-release.apk")
+        if (flutterApk.exists()) {
+            val dest = File(flutterDir, brandedName)
+            flutterApk.copyTo(dest, overwrite = true)
+            println("🏷️ [Branded Flutter APK]: Created ${dest.name} in ${flutterDir.path}")
+        }
+    }
+}
+
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    finalizedBy("packageBrandedReleaseApk")
+}
+

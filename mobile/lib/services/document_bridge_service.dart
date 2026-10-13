@@ -6,6 +6,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'local_storage_service.dart';
+import '../widgets/download_success_sheet.dart';
 
 class DocumentBridgeService {
   final BuildContext context;
@@ -54,11 +56,12 @@ class DocumentBridgeService {
     }
   }
 
-  /// Saves exported document to the Android Downloads folder or app documents
+  /// Saves exported document directly to local storage without requiring permissions
   Future<void> _handleDownloadFile(Map<String, dynamic> data) async {
     final String filename = data['filename'] ?? 'document_${DateTime.now().millisecondsSinceEpoch}.pdf';
     final String base64Data = data['base64Data'] ?? '';
     final String mimeType = data['mimeType'] ?? 'application/octet-stream';
+    final String? toolName = data['toolName'];
 
     if (base64Data.isEmpty) {
       _showSnackbar('File export failed: No data received', isError: true);
@@ -68,66 +71,22 @@ class DocumentBridgeService {
     try {
       final bytes = base64Decode(base64Data);
 
-      // Save to Downloads directory
-      Directory? targetDir;
-      if (Platform.isAndroid) {
-        // Standard Android public Download directory
-        final downloadDir = Directory('/storage/emulated/0/Download/ILoveMyOfficeWorks');
-        if (!downloadDir.existsSync()) {
-          try {
-            downloadDir.createSync(recursive: true);
-          } catch (_) {}
-        }
-        if (downloadDir.existsSync()) {
-          targetDir = downloadDir;
-        } else {
-          targetDir = await getExternalStorageDirectory();
-        }
-      } else {
-        targetDir = await getApplicationDocumentsDirectory();
-      }
-
-      targetDir ??= await getApplicationDocumentsDirectory();
-
-      final filePath = '${targetDir.path}/$filename';
-      final file = File(filePath);
-      await file.writeAsBytes(bytes);
+      // Save directly to app-accessible local storage (0 permissions needed)
+      final savedInfo = await LocalStorageService().saveFile(
+        filename: filename,
+        bytes: bytes,
+        mimeType: mimeType,
+        toolName: toolName,
+      );
 
       HapticFeedback.mediumImpact();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_rounded, color: Color(0xFF8B9A6E)),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Saved $filename to Downloads',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'Share',
-              textColor: const Color(0xFFEBF0E6),
-              onPressed: () {
-                SharePlus.instance.share(
-                  ShareParams(
-                    files: [XFile(filePath, mimeType: mimeType, name: filename)],
-                    text: 'Processed with ILoveMyOfficeWorks',
-                  ),
-                );
-              },
-            ),
-          ),
-        );
+        // Display rich celebratory bottom sheet with direct Share & Saved Files actions
+        await DownloadSuccessSheet.show(context, savedInfo);
       }
     } catch (e) {
-      debugPrint('Error saving file: $e');
+      debugPrint('Error saving local file: $e');
       _showSnackbar('Error saving file: $e', isError: true);
     }
   }

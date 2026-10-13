@@ -1,11 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/tool_item.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import '../constants/app_constants.dart';
 import '../services/local_server_service.dart';
+import '../services/document_bridge_service.dart';
+import '../services/local_storage_service.dart';
 import '../theme/app_theme.dart';
-import 'tool_workspace_screen.dart';
+import 'saved_files_screen.dart';
 import 'privacy_audit_dialog.dart';
 
+/// Main mobile application screen embedding the exact offline web engine (HomeScreen.jsx)
+/// with native Android zero-permission downloads, system share sheet, and tactile navbar.
 class HomeHubScreen extends StatefulWidget {
   final LocalServerService serverService;
 
@@ -19,31 +25,199 @@ class HomeHubScreen extends StatefulWidget {
 }
 
 class _HomeHubScreenState extends State<HomeHubScreen> {
-  ToolCategory? _selectedCategory;
-  String _searchQuery = '';
-  final TextEditingController _searchController = TextEditingController();
+  late final WebViewController _controller;
+  late final DocumentBridgeService _bridgeService;
+  final LocalStorageService _storageService = LocalStorageService();
 
-  List<ToolItem> get _filteredTools {
-    return ToolItem.allTools.where((tool) {
-      final matchesCategory = _selectedCategory == null || tool.category == _selectedCategory;
-      final matchesSearch = _searchQuery.isEmpty ||
-          tool.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          tool.description.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }).toList();
+  double _loadProgress = 0.0;
+  bool _isLoading = true;
+  int _currentNavIndex = 0;
+
+  bool get _isTestEnvironment => Platform.environment.containsKey('FLUTTER_TEST');
+
+  @override
+  void initState() {
+    super.initState();
+    _storageService.refreshCount();
+
+    _bridgeService = DocumentBridgeService(
+      context: context,
+    );
+
+    if (!_isTestEnvironment) {
+      _initWebView();
+    } else {
+      _isLoading = false;
+    }
   }
 
-  void _openTool(ToolItem? tool) {
+  void _initWebView() {
+    final url = widget.serverService.getUrl();
+
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(AppTheme.creamBg)
+      ..addJavaScriptChannel(
+        'FlutterBridge',
+        onMessageReceived: (JavaScriptMessage msg) {
+          _bridgeService.handleMessage(msg.message);
+        },
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            if (mounted) {
+              setState(() {
+                _loadProgress = progress / 100.0;
+                if (progress >= 100) {
+                  _isLoading = false;
+                }
+              });
+            }
+          },
+          onPageStarted: (String url) {
+            if (mounted) {
+              setState(() => _isLoading = true);
+            }
+          },
+          onPageFinished: (String url) {
+            if (mounted) {
+              setState(() => _isLoading = false);
+            }
+            _injectBridgeHelper();
+          },
+          onWebResourceError: (WebResourceError error) {
+            debugPrint('WebResourceError: ${error.errorCode} - ${error.description}');
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(url));
+  }
+
+  /// Injects helper scripts into the web environment for native integration
+  Future<void> _injectBridgeHelper() async {
+    const js = '''
+      (function() {
+        window.isMobileApp = true;
+        
+        // Listen for files passed from Flutter native picker
+        window.flutterOpenFiles = function(files) {
+          if (window.dispatchEvent) {
+            var event = new CustomEvent('flutter-files-received', { detail: files });
+            window.dispatchEvent(event);
+          }
+        };
+
+        // Notify Flutter on tool navigation
+        var originalPushState = history.pushState;
+        history.pushState = function() {
+          originalPushState.apply(this, arguments);
+          if (window.FlutterBridge) {
+            var hash = window.location.hash.replace('#', '');
+            if (hash) {
+              window.FlutterBridge.postMessage(JSON.stringify({ type: 'TOOL_CHANGED', toolId: hash }));
+            }
+          }
+        };
+
+        // Intercept any download clicks across the web application
+        document.addEventListener('click', function(e) {
+          var target = e.target.closest('a[download]');
+          if (target && target.href && window.FlutterBridge) {
+            var href = target.href;
+            var filename = target.getAttribute('download') || 'downloaded_document.pdf';
+            if (href.startsWith('blob:') || href.startsWith('data:')) {
+              e.preventDefault();
+              fetch(href).then(function(res) { return res.blob(); }).then(function(blob) {
+                var reader = new FileReader();
+                reader.onloadend = function() {
+                  var base64 = (reader.result || '').split(',')[1];
+                  if (base64) {
+                    window.FlutterBridge.postMessage(JSON.stringify({
+                      type: 'DOWNLOAD_FILE',
+                      filename: filename,
+                      base64Data: base64,
+                      mimeType: blob.type || 'application/octet-stream'
+                    }));
+                  }
+                };
+                reader.readAsDataURL(blob);
+              }).catch(function(err) {
+                console.error('Bridge download interception error:', err);
+              });
+            }
+          }
+        }, true);
+      })();
+    ''';
+    try {
+      await _controller.runJavaScript(js);
+    } catch (_) {}
+  }
+
+  Future<void> _handleBackPress() async {
+    try {
+      // If web app has an active tool open, navigate back to home screen
+      final result = await _controller.runJavaScriptReturningResult(
+        "Boolean(window.getAppTab && window.getAppTab() !== 'home');",
+      );
+      if (result == true || result.toString() == 'true') {
+        await _controller.runJavaScript("if (window.setAppTab) window.setAppTab('home');");
+        return;
+      }
+    } catch (_) {}
+
+    if (await _controller.canGoBack()) {
+      await _controller.goBack();
+    } else {
+      if (mounted) {
+        SystemNavigator.pop();
+      }
+    }
+  }
+
+  void _navigateToHome() {
     HapticFeedback.lightImpact();
+    setState(() => _currentNavIndex = 0);
+    _controller.runJavaScript(
+      "if (window.setAppTab) { window.setAppTab('home'); } else { window.location.href = '/?mobile=true'; }",
+    );
+  }
+
+  void _openSavedFiles() {
+    HapticFeedback.lightImpact();
+    setState(() => _currentNavIndex = 1);
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ToolWorkspaceScreen(
-          tool: tool,
-          serverService: widget.serverService,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => const SavedFilesScreen()),
+    ).then((_) {
+      _storageService.refreshCount();
+      if (mounted) setState(() => _currentNavIndex = 0);
+    });
+  }
+
+  void _openFullStudio() {
+    HapticFeedback.lightImpact();
+    setState(() => _currentNavIndex = 2);
+    _controller.runJavaScript(
+      "if (window.setAppTab) { window.setAppTab('merge-pdf'); } else { window.location.href = '/?tool=merge-pdf&mobile=true'; }",
     );
+  }
+
+  void _openPrivacyAudit() {
+    HapticFeedback.lightImpact();
+    setState(() => _currentNavIndex = 3);
+    showDialog(
+      context: context,
+      builder: (_) => PrivacyAuditDialog(
+        onConfigureServer: () {
+          Navigator.pop(context);
+          _showDevServerSettings();
+        },
+      ),
+    ).then((_) {
+      if (mounted) setState(() => _currentNavIndex = 0);
+    });
   }
 
   void _showDevServerSettings() {
@@ -55,50 +229,55 @@ class _HomeHubScreenState extends State<HomeHubScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: AppTheme.creamBg,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text('Server Configuration', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeThumbColor: AppTheme.primarySage,
-                title: const Text('Use Dev Server', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                subtitle: const Text('Connect to Vite dev server on host machine', style: TextStyle(fontSize: 12)),
-                value: useDev,
-                onChanged: (val) {
-                  setDialogState(() => useDev = val);
-                },
-              ),
-              if (useDev) ...[
-                const SizedBox(height: 10),
-                TextField(
-                  controller: devUrlController,
-                  decoration: const InputDecoration(
-                    labelText: 'Dev Server URL',
-                    hintText: 'http://10.0.2.2:5173',
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    activeThumbColor: AppTheme.primarySage,
+                    title: const Text('Use Dev Server', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Connect to Vite dev server on host machine', style: TextStyle(fontSize: 12)),
+                    value: useDev,
+                    onChanged: (val) {
+                      setDialogState(() => useDev = val);
+                    },
                   ),
-                  style: const TextStyle(fontSize: 13),
-                ),
-              ],
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppTheme.sageLight,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  useDev
-                      ? 'Connected to local host network for HMR development.'
-                      : 'Running 100% offline from bundled loopback server (port ${widget.serverService.port}).',
-                  style: const TextStyle(fontSize: 11, color: AppTheme.forestDark),
-                ),
+                  if (useDev) ...[
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: devUrlController,
+                      decoration: const InputDecoration(
+                        labelText: 'Dev Server URL',
+                        hintText: 'http://10.0.2.2:5173',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.sageLight,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      useDev
+                          ? 'Connected to local host network for live HMR development.'
+                          : '${AppConstants.appName} ${AppConstants.fullVersion} running 100% offline from bundled loopback server (port ${widget.serverService.port}). Zero cloud transmission.',
+                      style: const TextStyle(fontSize: 11, color: AppTheme.forestDark, height: 1.3),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
           actions: [
             TextButton(
@@ -111,6 +290,7 @@ class _HomeHubScreenState extends State<HomeHubScreen> {
                   widget.serverService.setUseDevServer(useDev, customUrl: devUrlController.text);
                 });
                 Navigator.pop(ctx);
+                _controller.loadRequest(Uri.parse(widget.serverService.getUrl()));
               },
               style: FilledButton.styleFrom(backgroundColor: AppTheme.primarySage),
               child: const Text('Apply'),
@@ -123,400 +303,90 @@ class _HomeHubScreenState extends State<HomeHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filteredTools;
-
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 16,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.borderLight),
-                image: const DecorationImage(
-                  image: AssetImage('assets/logo.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            RichText(
-              text: const TextSpan(
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
-                children: [
-                  TextSpan(text: 'ILoveMy'),
-                  TextSpan(text: 'OfficeWorks', style: TextStyle(color: AppTheme.primarySage)),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppTheme.primarySage.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: AppTheme.primarySage.withValues(alpha: 0.2)),
-              ),
-              child: const Text(
-                'ANDROID',
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.forestDark,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shield_outlined, color: AppTheme.primarySage),
-            tooltip: '100% Client-Side Privacy Audit',
-            onPressed: () => showDialog(
-              context: context,
-              builder: (_) => const PrivacyAuditDialog(),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppTheme.forestDark),
-            tooltip: 'Settings / Dev Server',
-            onPressed: _showDevServerSettings,
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // 1. Privacy Guarantee Banner
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppTheme.sageTint,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppTheme.primarySage.withValues(alpha: 0.25)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppTheme.primarySage.withValues(alpha: 0.2)),
-                        ),
-                        child: const Icon(Icons.lock_rounded, color: AppTheme.primarySage, size: 18),
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '100% Private Offline Processing',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.forestDark,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Zero cloud upload. All documents process in your phone’s memory.',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: AppTheme.textSecondary,
-                                height: 1.25,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (_) => const PrivacyAuditDialog(),
-                        ),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppTheme.primarySage,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        child: const Text('Verify', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // 2. Search Field
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                  decoration: InputDecoration(
-                    hintText: 'Search 20+ PDF and Office tools...',
-                    hintStyle: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                    prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.textSecondary, size: 20),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                          )
-                        : null,
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppTheme.borderLight),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppTheme.borderLight),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppTheme.primarySage, width: 1.5),
-                    ),
-                  ),
-                  style: const TextStyle(fontSize: 13),
-                ),
-              ),
-            ),
-
-            // 3. Category Filter Chips (Horizontal)
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 48,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  children: [
-                    _buildFilterChip(
-                      label: 'All (${ToolItem.allTools.length})',
-                      isSelected: _selectedCategory == null,
-                      onTap: () => setState(() => _selectedCategory = null),
-                    ),
-                    ...ToolCategory.values.map((cat) {
-                      final count = ToolItem.allTools.where((t) => t.category == cat).length;
-                      return _buildFilterChip(
-                        label: '${cat.title} ($count)',
-                        isSelected: _selectedCategory == cat,
-                        onTap: () => setState(() => _selectedCategory = cat),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
-
-            // 4. Tools Grid
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
-              sliver: filtered.isEmpty
-                  ? SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.search_off_rounded, size: 48, color: AppTheme.textMuted.withValues(alpha: 0.5)),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'No matching tools found',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Try clearing your search query or choosing another category.',
-                              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 0.88,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final tool = filtered[index];
-                          return _buildToolCard(tool);
-                        },
-                        childCount: filtered.length,
-                      ),
-                    ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppTheme.creamBg,
-          border: const Border(top: BorderSide(color: AppTheme.borderLight)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => _openTool(null),
-                icon: const Icon(Icons.dashboard_customize_rounded, size: 18),
-                label: const Text('Open Full Studio'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.forestDark,
-                  side: const BorderSide(color: AppTheme.borderMedium),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () => _openTool(ToolItem.allTools.firstWhere((t) => t.id == 'merge-pdf')),
-                icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
-                label: const Text('Merge PDFs'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChip({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primarySage : Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected ? AppTheme.primarySage : AppTheme.borderLight,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : AppTheme.forestDark,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToolCard(ToolItem tool) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppTheme.borderLight, width: 1),
-      ),
-      child: InkWell(
-        onTap: () => _openTool(tool),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _handleBackPress();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: Stack(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: tool.category.badgeColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(tool.icon, color: tool.category.badgeColor, size: 20),
+              _isTestEnvironment
+                  ? const Center(child: Text('ILoveMyOfficeWorks Web Engine'))
+                  : WebViewWidget(controller: _controller),
+              if (_isLoading)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: LinearProgressIndicator(
+                    value: _loadProgress > 0 ? _loadProgress : null,
+                    backgroundColor: Colors.transparent,
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primarySage),
+                    minHeight: 2.5,
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppTheme.sageLight,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      tool.category.title.split(' ')[0],
-                      style: const TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.forestDark,
-                      ),
-                    ),
+                ),
+            ],
+          ),
+        ),
+
+        // Bottom Navigation Bar / Navbar
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: const Border(top: BorderSide(color: AppTheme.borderLight, width: 1)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -3),
+              ),
+            ],
+          ),
+          child: NavigationBar(
+            selectedIndex: _currentNavIndex,
+            onDestinationSelected: (index) {
+              if (index == 0) _navigateToHome();
+              if (index == 1) _openSavedFiles();
+              if (index == 2) _openFullStudio();
+              if (index == 3) _openPrivacyAudit();
+            },
+            backgroundColor: Colors.white,
+            indicatorColor: AppTheme.sageTint,
+            elevation: 0,
+            height: 64,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            destinations: [
+              const NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home_rounded, color: AppTheme.primarySage),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: ValueListenableBuilder<int>(
+                  valueListenable: _storageService.savedFilesCount,
+                  builder: (context, count, _) => Badge(
+                    isLabelVisible: count > 0,
+                    label: Text(count.toString()),
+                    backgroundColor: AppTheme.primarySage,
+                    child: const Icon(Icons.folder_shared_outlined),
                   ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                tool.name,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.textPrimary,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                selectedIcon: const Icon(Icons.folder_shared_rounded, color: AppTheme.primarySage),
+                label: 'Saved Files',
               ),
-              const SizedBox(height: 4),
-              Text(
-                tool.description,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppTheme.textSecondary,
-                  height: 1.25,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              const NavigationDestination(
+                icon: Icon(Icons.dashboard_customize_outlined),
+                selectedIcon: Icon(Icons.dashboard_customize_rounded, color: AppTheme.primarySage),
+                label: 'Studio',
+              ),
+              const NavigationDestination(
+                icon: Icon(Icons.shield_outlined),
+                selectedIcon: Icon(Icons.shield_rounded, color: AppTheme.primarySage),
+                label: 'Privacy',
               ),
             ],
           ),
