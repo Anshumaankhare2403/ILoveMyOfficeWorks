@@ -54,12 +54,24 @@ ILoveMyOfficeWorks/
 │   ├── electron-builder.json          # Windows installer (NSIS) and portable config
 │   ├── package.json                   # Desktop scripts & Electron dependencies
 │   └── README.md                      # Desktop setup and build guide
-├── mobile/                            # Android Mobile Application (Flutter)
+├── mobile/                            # Android Mobile Application (Flutter v0.5.6)
 │   ├── android/                       # Android configuration (Kotlin, Gradle, Manifest)
+│   │   └── app/build.gradle.kts       # Gradle config with automated branded APK task
 │   ├── assets/                        # App logo & offline WebAssembly bundle
 │   ├── lib/                           # Flutter screens, loopback server & bridge
-│   ├── pubspec.yaml                   # Flutter dependencies (webview_flutter, file_picker, etc.)
+│   │   ├── constants/                 # Centralized app branding & version tokens (v0.5.6)
+│   │   ├── models/                    # Tool items, categories, and file metadata
+│   │   ├── screens/                   # HomeHubScreen, SavedFilesScreen, Workspace, Privacy Dialog
+│   │   ├── services/                  # Loopback server, document bridge, zero-permission storage
+│   │   ├── theme/                     # Material 3 Luxury Sage tokens
+│   │   └── widgets/                   # DownloadSuccessSheet, Drawer, PrivacyGuaranteeSection
+│   ├── test/                          # Responsive layout tests & smoke tests
+│   ├── pubspec.yaml                   # Flutter dependencies & version 0.5.6+56
 │   └── README.md                      # Mobile setup and build guide
+├── scripts/                           # Build & release packaging automation
+│   ├── sync-mobile-assets.js          # Syncs client dist to mobile assets
+│   ├── package-mobile-release.js      # Packages ILoveMyOfficeWorks-v0.5.6.apk to dist/
+│   └── generate-android-icons.ps1     # Android mipmap icon generator
 └── server/                            # Optional Localhost Helper (Port 3001)
     └── server.js                      # Localhost Ghostscript bridge (optional)
 ```
@@ -84,9 +96,19 @@ ILoveMyOfficeWorks/
   ```bash
   npm run mobile:dev
   ```
-- **Build Android Mobile APK (.apk):**
+- **Build & Package Branded Android Release APK (v0.5.6):**
   ```bash
   npm run mobile:build
+  # Outputs: dist/ILoveMyOfficeWorks-v0.5.6.apk & mobile/build/app/outputs/flutter-apk/ILoveMyOfficeWorks-v0.5.6.apk
+  ```
+- **Package Release APK & Verify SHA-256 Checksum:**
+  ```bash
+  npm run mobile:package
+  ```
+- **Run Mobile Automated Test Suite:**
+  ```bash
+  npm run mobile:test
+  # Runs 10 automated responsive & widget tests across phone, tablet, and landscape viewports
   ```
 - **Build Client for Production:**
   ```bash
@@ -97,6 +119,33 @@ ILoveMyOfficeWorks/
   ```bash
   npm run desktop:build
   ```
+
+---
+
+## 📱 Mobile Architecture & Responsiveness Guidelines
+
+When working in `mobile/`, AI agents must adhere to the following rules:
+
+1. **Brand & Version Source of Truth**:
+   - Official brand: `ILoveMyOfficeWorks` (matches Android label).
+   - Official version: `0.5.6` (`version: 0.5.6+56` in `pubspec.yaml`).
+   - Centralized constants: Always use `AppConstants.appName` and `AppConstants.appVersion` from `mobile/lib/constants/app_constants.dart`.
+
+2. **Single-Header Constraint**:
+   - `HomeHubScreen` must NOT render a Flutter `AppBar`. The embedded web view renders its own tailored Luxury Sage `<header>`. A second native header creates duplicate navigation bars and wastes screen space.
+
+3. **Zero-Permission Offline Storage (`LocalStorageService`)**:
+   - Do NOT prompt the user for dangerous Android storage permissions (`MANAGE_EXTERNAL_STORAGE` or `WRITE_EXTERNAL_STORAGE`).
+   - Store processed files in app documents / cache directories and provide instant export via `share_plus` or scoped downloads.
+
+4. **Responsive Layout & Overflow Prevention**:
+   - **Landscape Viewport Hazard (height ~360px)**: Always wrap modal dialogs and bottom sheets in `ConstrainedBox(maxHeight: screenSize.height * 0.88)` and `SingleChildScrollView`.
+   - **Narrow Viewport Hazard (width 320px–360px)**: Use `Wrap(spacing: 8, runSpacing: 8)` or `LayoutBuilder` instead of rigid multi-button `Row`s.
+   - **Text Scaling (1.5x–2.0x)**: Add `TextOverflow.ellipsis` and `maxLines` to all headers, action badges, and filenames.
+
+5. **Verification Pipeline**:
+   - Run `flutter analyze` in `mobile/` (must maintain 0 issues).
+   - Run `flutter test` in `mobile/` (must maintain 100% pass rate).
 
 ---
 

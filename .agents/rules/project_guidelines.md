@@ -35,3 +35,11 @@ When contributing or refactoring code in this repository, follow these rules str
 
 ## 4. Verification & Build Integrity
 - Always run `npm run build --prefix client` after making frontend changes to ensure 100% clean production compilation.
+
+## 5. Mobile & Android Application Guidelines
+- **Brand & Version**: Always preserve `AppConstants.appName` (`ILoveMyOfficeWorks`) and `AppConstants.appVersion` (`0.5.6`).
+- **Single-Header Rule**: `HomeHubScreen` must NOT render a Flutter `AppBar`. The embedded web view renders its own tailored Luxury Sage `<header>`.
+- **Zero-Permission Offline Storage**: Use `LocalStorageService` for on-device document storage and sharing without prompting for runtime Android storage permissions.
+- **Responsive Layouts & Landscape Resilience**: Constrain dialogs and bottom sheets with `ConstrainedBox(maxHeight: screenSize.height * 0.88)` and `SingleChildScrollView` to prevent `RenderFlex` overflows. Use `Wrap` for buttons and `TextOverflow.ellipsis` on titles.
+- **Mobile Verification**: Always run `npm run mobile:test` (`flutter test`) and `flutter analyze` when modifying the mobile codebase.
+

@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Privacy-100%25_Client--Side-5B7147?style=for-the-badge&logo=shield" alt="100% Client-Side" />
   <img src="https://img.shields.io/badge/Tools-35_Active_Tools-435433?style=for-the-badge&logo=wpexplorer" alt="35 Tools" />
   <img src="https://img.shields.io/badge/Desktop-Windows_v2.5.0-5B7147?style=for-the-badge&logo=windows" alt="Windows v2.5.0" />
-  <img src="https://img.shields.io/badge/Mobile-Android_Flutter-5B7147?style=for-the-badge&logo=android" alt="Android Flutter" />
+  <img src="https://img.shields.io/badge/Mobile-Android_v0.5.6-5B7147?style=for-the-badge&logo=android" alt="Android v0.5.6" />
   <img src="https://img.shields.io/badge/Frontend-React_18_+_Vite_6-61DAFB?style=for-the-badge&logo=react" alt="React 18 + Vite" />
   <img src="https://img.shields.io/badge/Styling-Tailwind_CSS_3.4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Theme-Luxury_Sage-5B7147?style=for-the-badge" alt="Luxury Sage" />
@@ -451,9 +451,9 @@ On first launch, Windows SmartScreen may show an *"Unrecognized app"* notice bec
 
 ---
 
-## 📱 Android Mobile Application (Flutter)
+## 📱 Android Mobile Application (Flutter v0.5.6)
 
-The project includes a dedicated `mobile/` workspace containing the full **Flutter Android Edition**:
+The project includes a dedicated `mobile/` workspace containing the full **Flutter Android Edition (v0.5.6)**:
 
 ### 1. Run Mobile in Development Mode
 Connect an Android device via USB/Wi-Fi or start an Android Virtual Device emulator, then run:
@@ -461,13 +461,19 @@ Connect an Android device via USB/Wi-Fi or start an Android Virtual Device emula
 npm run mobile:dev
 ```
 
-### 2. Build Android Release APK (.apk)
-Compiles and packages the release APK containing the bundled offline document engine:
+### 2. Build Android Branded Release APK (.apk)
+Compiles, optimizes, and automatically packages the branded release APK:
 ```bash
 npm run mobile:build
 ```
-The resulting installer is saved at:
-`mobile/build/app/outputs/flutter-apk/app-release.apk`
+This produces the official branded distribution files:
+- **`dist/ILoveMyOfficeWorks-v0.5.6.apk`** (~53.5 MB) — Verified production distribution APK.
+- **`mobile/build/app/outputs/flutter-apk/ILoveMyOfficeWorks-v0.5.6.apk`** — Direct Flutter/Gradle release artifact.
+
+To re-package or verify SHA-256 checksums at any time:
+```bash
+npm run mobile:package
+```
 
 ### 3. Build Architecture Split APKs
 Generates optimized per-ABI APKs (arm64-v8a, armeabi-v7a, x86_64) for lightweight sideloading:
@@ -480,11 +486,23 @@ npm run mobile:apk
 npm run mobile:bundle
 ```
 
+### 5. Run Mobile Test Suite
+```bash
+npm run mobile:test
+```
+
 ### 🌟 Mobile-Exclusive Android Features:
 - **Material 3 Luxury Sage Native Hub**: Filter across all tools with responsive search, category chips, and tactile cards styled with brand tokens (`#5B7147`, `#FAF8F4`).
+- **Single-Header Architecture**: Clean, unified viewport with zero duplicate headers or navigation clutter.
+- **Zero-Permission Offline Storage (`LocalStorageService`)**:
+  - Processed documents save directly to app storage without prompting users for intrusive Android storage permissions.
+  - Dedicated **Saved Files Manager** (`SavedFilesScreen`) with instant searching, file metadata inspection, batch deletion, and sharing.
+- **Responsive Layout Engine**:
+  - Fully tested and optimized for small devices (320px–360px), standard phones, tablets (800px–1280px), landscape orientation, and 1.5x accessibility font scaling.
+  - Zero `RenderFlex` overflow errors across all dialogs, bottom sheets, and tool screens.
 - **100% Offline Loopback Engine**: An embedded Dart `HttpServer` binds strictly to IPv4 loopback (`127.0.0.1`) to run WebAssembly, HTML5 Canvas, and Web Worker operations in device memory without external network calls.
 - **Two-Way JavaScript Bridge (`FlutterBridge`)**:
-  - Direct downloads saved automatically to Android's `Downloads/ILoveMyOfficeWorks/` folder.
+  - Native download handler triggers the responsive `DownloadSuccessSheet`.
   - Native Android Share Sheet (`share_plus`) to send converted files directly to WhatsApp, Gmail, Drive, etc.
   - Native Document Picker (`file_picker`) to select files from internal storage, SD cards, or Google Drive.
   - Native haptic feedback on touch gestures.
@@ -526,6 +544,18 @@ npm test
    - Tests server health endpoints, fallback responses (HTTP 503) when Ghostscript is unavailable, and temporary file cleanup.
 5. **PDF Magic Utilities & File Inspector**:
    - Tests byte inspection, `%PDF-` header validation, 200MB file size limits, and image/Office file format detection.
+
+### Flutter Mobile Test Suite:
+```bash
+# Run all mobile unit and responsive widget tests (10 automated tests)
+npm run mobile:test
+
+# Or directly in mobile directory
+cd mobile && flutter test
+```
+- **Responsive Layout Tests**: Small device (320x568), narrow portrait (320px), landscape mode (844x390, 844x360), tablet viewport (800x1280), and 1.5x accessibility scaling.
+- **RenderFlex Overflow Protection**: Verifies dialogs, sheets, and file managers render with zero pixel clipping or layout overflows.
+- **Offline Loopback & Mock Bridge Verification**: Tests headless environment guards for WebView and platform channels.
 
 ---
 
