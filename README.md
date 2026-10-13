@@ -35,7 +35,7 @@
 - [🧩 Pluggable Tool Adapter Pattern](#-pluggable-tool-adapter-pattern)
 - [🚀 Quick Start \& Installation](#-quick-start--installation)
 - [🪟 Windows Desktop Application (Electron.js)](#-windows-desktop-application-electronjs)
-- [📱 Android Mobile Application (Flutter)](#-android-mobile-application-flutter)
+- [📱 Android Mobile Application (Flutter v0.5.6)](#-android-mobile-application-flutter-v056)
 - [⚙️ Optional Localhost Server (Ghostscript)](#️-optional-localhost-server-ghostscript)
 - [🧪 Automated Testing & Verification](#-automated-testing--verification)
 - [📚 Documentation Index](#-documentation-index)
@@ -295,6 +295,24 @@ ILoveMyOfficeWorks/
 │   ├── electron-builder.json          # Windows installer (NSIS) and portable config
 │   ├── package.json                   # Desktop scripts & Electron dependencies
 │   └── README.md                      # Desktop setup and build guide
+├── mobile/                            # Android Mobile Application (Flutter v0.5.6)
+│   ├── android/                       # Android configuration (Kotlin, Gradle, Manifest)
+│   │   └── app/build.gradle.kts       # Gradle config with automated branded release task
+│   ├── assets/                        # App logo & offline WebAssembly bundle
+│   ├── lib/                           # Flutter screens, loopback server & bridge
+│   │   ├── constants/                 # Centralized app branding & version tokens (v0.5.6)
+│   │   ├── models/                    # Tool items, categories, and file metadata
+│   │   ├── screens/                   # HomeHubScreen, SavedFilesScreen, Workspace, Privacy Dialog
+│   │   ├── services/                  # Loopback server, document bridge, zero-permission storage
+│   │   ├── theme/                     # Material 3 Luxury Sage tokens
+│   │   └── widgets/                   # DownloadSuccessSheet, Drawer, PrivacyGuaranteeSection
+│   ├── test/                          # 10 responsive layout tests & smoke tests
+│   ├── pubspec.yaml                   # Flutter dependencies & version 0.5.6+56
+│   └── README.md                      # Mobile setup and build guide
+├── scripts/                           # Build & release packaging automation
+│   ├── sync-mobile-assets.js          # Syncs client dist to mobile assets
+│   ├── package-mobile-release.js      # Packages ILoveMyOfficeWorks-v0.5.6.apk to dist/
+│   └── generate-android-icons.ps1     # Android mipmap icon generator
 └── server/                            # Optional Localhost Helper (Port 3001)
     └── server.js                      # Localhost Ghostscript bridge (optional)
 ```
@@ -395,6 +413,15 @@ Open your browser and navigate to: **`http://localhost:5173/`**
 npm run build --prefix client
 ```
 The optimized production bundle will be output to `client/dist/`.
+
+### 4. Run Mobile App (Android v0.5.6)
+```bash
+# Sync web engine and launch Flutter app on connected Android device / emulator
+npm run mobile:dev
+
+# Or build & package the branded release APK (dist/ILoveMyOfficeWorks-v0.5.6.apk)
+npm run mobile:build
+```
 
 ---
 
