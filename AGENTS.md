@@ -54,6 +54,12 @@ ILoveMyOfficeWorks/
 │   ├── electron-builder.json          # Windows installer (NSIS) and portable config
 │   ├── package.json                   # Desktop scripts & Electron dependencies
 │   └── README.md                      # Desktop setup and build guide
+├── mobile/                            # Android Mobile Application (Flutter)
+│   ├── android/                       # Android configuration (Kotlin, Gradle, Manifest)
+│   ├── assets/                        # App logo & offline WebAssembly bundle
+│   ├── lib/                           # Flutter screens, loopback server & bridge
+│   ├── pubspec.yaml                   # Flutter dependencies (webview_flutter, file_picker, etc.)
+│   └── README.md                      # Mobile setup and build guide
 └── server/                            # Optional Localhost Helper (Port 3001)
     └── server.js                      # Localhost Ghostscript bridge (optional)
 ```
@@ -73,6 +79,14 @@ ILoveMyOfficeWorks/
 - **Run Windows Desktop App (Production Bundle):**
   ```bash
   npm run desktop:start
+  ```
+- **Run Android Mobile App (Dev Mode):**
+  ```bash
+  npm run mobile:dev
+  ```
+- **Build Android Mobile APK (.apk):**
+  ```bash
+  npm run mobile:build
   ```
 - **Build Client for Production:**
   ```bash

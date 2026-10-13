@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/badge/Privacy-100%25_Client--Side-5B7147?style=for-the-badge&logo=shield" alt="100% Client-Side" />
   <img src="https://img.shields.io/badge/Tools-35_Active_Tools-435433?style=for-the-badge&logo=wpexplorer" alt="35 Tools" />
   <img src="https://img.shields.io/badge/Desktop-Windows_v2.5.0-5B7147?style=for-the-badge&logo=windows" alt="Windows v2.5.0" />
+  <img src="https://img.shields.io/badge/Mobile-Android_Flutter-5B7147?style=for-the-badge&logo=android" alt="Android Flutter" />
   <img src="https://img.shields.io/badge/Frontend-React_18_+_Vite_6-61DAFB?style=for-the-badge&logo=react" alt="React 18 + Vite" />
   <img src="https://img.shields.io/badge/Styling-Tailwind_CSS_3.4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Theme-Luxury_Sage-5B7147?style=for-the-badge" alt="Luxury Sage" />
@@ -34,6 +35,7 @@
 - [🧩 Pluggable Tool Adapter Pattern](#-pluggable-tool-adapter-pattern)
 - [🚀 Quick Start \& Installation](#-quick-start--installation)
 - [🪟 Windows Desktop Application (Electron.js)](#-windows-desktop-application-electronjs)
+- [📱 Android Mobile Application (Flutter)](#-android-mobile-application-flutter)
 - [⚙️ Optional Localhost Server (Ghostscript)](#️-optional-localhost-server-ghostscript)
 - [🧪 Automated Testing & Verification](#-automated-testing--verification)
 - [📚 Documentation Index](#-documentation-index)
@@ -446,6 +448,47 @@ This guarantees the Luxury Sage brand logo renders crisply with zero blur or gen
 
 ### 🛡️ Windows SmartScreen Note
 On first launch, Windows SmartScreen may show an *"Unrecognized app"* notice because the executable is self-distributed rather than signed with a commercial certificate. Simply click **"More info"** → **"Run anyway"** to launch.
+
+---
+
+## 📱 Android Mobile Application (Flutter)
+
+The project includes a dedicated `mobile/` workspace containing the full **Flutter Android Edition**:
+
+### 1. Run Mobile in Development Mode
+Connect an Android device via USB/Wi-Fi or start an Android Virtual Device emulator, then run:
+```bash
+npm run mobile:dev
+```
+
+### 2. Build Android Release APK (.apk)
+Compiles and packages the release APK containing the bundled offline document engine:
+```bash
+npm run mobile:build
+```
+The resulting installer is saved at:
+`mobile/build/app/outputs/flutter-apk/app-release.apk`
+
+### 3. Build Architecture Split APKs
+Generates optimized per-ABI APKs (arm64-v8a, armeabi-v7a, x86_64) for lightweight sideloading:
+```bash
+npm run mobile:apk
+```
+
+### 4. Build Android App Bundle (.aab)
+```bash
+npm run mobile:bundle
+```
+
+### 🌟 Mobile-Exclusive Android Features:
+- **Material 3 Luxury Sage Native Hub**: Filter across all tools with responsive search, category chips, and tactile cards styled with brand tokens (`#5B7147`, `#FAF8F4`).
+- **100% Offline Loopback Engine**: An embedded Dart `HttpServer` binds strictly to IPv4 loopback (`127.0.0.1`) to run WebAssembly, HTML5 Canvas, and Web Worker operations in device memory without external network calls.
+- **Two-Way JavaScript Bridge (`FlutterBridge`)**:
+  - Direct downloads saved automatically to Android's `Downloads/ILoveMyOfficeWorks/` folder.
+  - Native Android Share Sheet (`share_plus`) to send converted files directly to WhatsApp, Gmail, Drive, etc.
+  - Native Document Picker (`file_picker`) to select files from internal storage, SD cards, or Google Drive.
+  - Native haptic feedback on touch gestures.
+- **In-App Dev Server Switcher**: Toggle between offline bundled assets and the live Vite dev server (`http://10.0.2.2:5173`) in real-time.
 
 ---
 

@@ -14,7 +14,14 @@
     "desktop:make": "npm run desktop:build",
     "desktop:portable": "npm run build --prefix client && npm run dist:portable --prefix desktop",
     "desktop:pack": "npm run build --prefix client && npm run pack --prefix desktop",
-    "install:all": "npm install && npm install --prefix client && npm install --prefix server && npm install --prefix desktop"
+    "mobile:sync": "npm run build --prefix client && node scripts/sync-mobile-assets.js",
+    "mobile:dev": "npm run mobile:sync && concurrently -k \"npm run dev --prefix client\" \"cd mobile && flutter run\"",
+    "mobile:run": "npm run mobile:sync && cd mobile && flutter run",
+    "mobile:build": "npm run mobile:sync && cd mobile && flutter build apk --release",
+    "mobile:apk": "npm run mobile:sync && cd mobile && flutter build apk --split-per-abi",
+    "mobile:bundle": "npm run mobile:sync && cd mobile && flutter build appbundle",
+    "mobile:test": "cd mobile && flutter test",
+    "install:all": "npm install && npm install --prefix client && npm install --prefix server && npm install --prefix desktop && cd mobile && flutter pub get"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

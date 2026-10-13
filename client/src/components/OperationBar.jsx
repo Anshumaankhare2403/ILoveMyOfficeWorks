@@ -37,6 +37,7 @@ import {
   GitCompare,
   Maximize2,
   Images,
+  Share2,
 } from 'lucide-react';
 import { getRegisteredAdapters, executeAdapter } from '../registry/registry';
 import { formatFileSize } from '../utils/pdf-magic';
@@ -150,6 +151,26 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
       return;
     }
 
+    // Support native Android file saving via FlutterBridge
+    if (typeof window !== 'undefined' && window.FlutterBridge && executionResult?.blob) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Data = (reader.result || '').split(',')[1];
+        if (base64Data) {
+          window.FlutterBridge.postMessage(
+            JSON.stringify({
+              type: 'DOWNLOAD_FILE',
+              filename: downloadName,
+              base64Data: base64Data,
+              mimeType: executionResult.blob.type || 'application/octet-stream',
+            })
+          );
+        }
+      };
+      reader.readAsDataURL(executionResult.blob);
+      return;
+    }
+
     const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = downloadName;
@@ -162,6 +183,26 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
         // Ignored
       }
     }, 150);
+  };
+
+  const triggerShare = () => {
+    if (typeof window !== 'undefined' && window.FlutterBridge && executionResult?.blob) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Data = (reader.result || '').split(',')[1];
+        if (base64Data) {
+          window.FlutterBridge.postMessage(
+            JSON.stringify({
+              type: 'SHARE_FILE',
+              filename: executionResult.filename || 'document.pdf',
+              base64Data: base64Data,
+              mimeType: executionResult.blob.type || 'application/octet-stream',
+            })
+          );
+        }
+      };
+      reader.readAsDataURL(executionResult.blob);
+    }
   };
 
   const getAdapterIcon = (id) => {
@@ -554,6 +595,18 @@ export default function OperationBar({ files, onReset, activeToolId = 'merge-pdf
                     : 'Download PDF Document'}
                 </span>
               </button>
+
+              {typeof window !== 'undefined' && window.FlutterBridge && (
+                <button
+                  type="button"
+                  onClick={triggerShare}
+                  title="Share document"
+                  className="py-3 px-3.5 rounded-xl bg-[#8B9A6E]/20 hover:bg-[#8B9A6E]/30 text-[#434D31] font-bold text-sm flex items-center justify-center gap-1.5 border border-[#8B9A6E]/40 transition-all shrink-0"
+                >
+                  <Share2 className="w-4 h-4 shrink-0" />
+                  <span className="hidden sm:inline">Share</span>
+                </button>
+              )}
 
               <button
                 type="button"

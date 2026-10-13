@@ -200,6 +200,29 @@ function MainApp() {
     }
   }, []);
 
+  // Listen for URL tool query/hash and Flutter Android native files
+  useEffect(() => {
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const urlTool = searchParams.get('tool') || window.location.hash.replace('#', '').replace('tool=', '');
+      if (urlTool && TOOL_CONFIGS[urlTool]) {
+        setActiveTab(urlTool);
+        setShowSplash(false);
+      }
+    } catch {
+      // ignore
+    }
+
+    const handleFlutterFiles = (e) => {
+      const rawFiles = e.detail;
+      if (rawFiles && rawFiles.length > 0) {
+        importDesktopFiles(rawFiles);
+      }
+    };
+    window.addEventListener('flutter-files-received', handleFlutterFiles);
+    return () => window.removeEventListener('flutter-files-received', handleFlutterFiles);
+  }, []);
+
   const [queuePage, setQueuePage] = useState(1);
   const PAGE_SIZE = 30;
 
