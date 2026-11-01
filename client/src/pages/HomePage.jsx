@@ -39,6 +39,7 @@ import {
   Images,
 } from 'lucide-react';
 import Uploader from '../components/common/Uploader';
+import { TOTAL_TOOL_COUNT } from '../constants/tools';
 
 export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {}, onShowSplash }) {
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('all');
@@ -532,7 +533,7 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5B7147]/10 border border-[#5B7147]/25 text-[#435433] text-xs font-bold uppercase tracking-wider"
         >
           <Sparkles className="w-3.5 h-3.5 text-[#5B7147]" />
-          <span>Local PDF & Image Engine • 33 Complete Tools</span>
+          <span>Local PDF & Image Engine • {TOTAL_TOOL_COUNT} Complete Tools</span>
         </motion.div>
 
         <motion.h2
@@ -655,7 +656,7 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search all 33 tools..."
+            placeholder={`Search all ${TOTAL_TOOL_COUNT} tools...`}
             className="w-full bg-white border border-[#DDD3C2] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#1E2619] placeholder-[#8B987E] focus:outline-none focus:border-[#5B7147] focus:ring-1 focus:ring-[#5B7147] transition-all"
           />
           {searchQuery && (
@@ -670,7 +671,32 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
         </div>
       </div>
 
-      {/* Category Grid Layout Matching User Suites */}
+      {/* Category Grid Layout Matching User Suites OR Empty Search State */}
+      {filteredCategories.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 bg-white/80 border border-[#DDD3C2] rounded-3xl text-center space-y-4 my-6 shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-[#5B7147]/10 text-[#435433] flex items-center justify-center border border-[#5B7147]/20">
+            <Search className="w-7 h-7 text-[#5B7147]" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-[#1E2619]">
+              {searchQuery ? `No tools found for "${searchQuery}"` : 'No tools found in this category'}
+            </h3>
+            <p className="text-xs text-[#6B795D] max-w-sm">
+              Check your search query or reset your filters to browse all {TOTAL_TOOL_COUNT} tools.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery('');
+              setActiveCategoryFilter('all');
+            }}
+            className="px-4 py-2 rounded-xl bg-[#5B7147] hover:bg-[#435433] text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
+          >
+            Clear search & filters
+          </button>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-4">
         {filteredCategories.map((category) => {
           const CategoryIcon = category.icon;
@@ -741,6 +767,7 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
           );
         })}
       </div>
+      )}
 
       {/* Feature & Privacy Highlights */}
       <div className="grid sm:grid-cols-3 gap-4 pt-4 border-t border-[#E5DDD0]">
@@ -779,7 +806,7 @@ export default function HomeScreen({ onSelectTool, onQuickUpload, fileCounts = {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white/70 border border-[#DDD3C2] text-xs text-[#5B6B50] shadow-xs">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-[#5B7147] shrink-0" />
-          <span>All 33 tools run entirely client-side with zero external telemetry or cloud storage.</span>
+          <span>All {TOTAL_TOOL_COUNT} tools run entirely client-side with zero external telemetry or cloud storage.</span>
         </div>
         {onShowSplash && (
           <button

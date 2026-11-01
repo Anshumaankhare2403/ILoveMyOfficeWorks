@@ -4,7 +4,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UploadCloud, FileWarning, Loader2, Plus, Sparkles } from 'lucide-react';
 import { inspectPdfFile, MAX_FILE_SIZE } from '../../utils/pdf-magic';
 
-export default function Uploader({ onFilesAdded, compact = false }) {
+const DEFAULT_ACCEPT = {
+  'application/pdf': ['.pdf'],
+  'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif'],
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+  'text/html': ['.html', '.htm'],
+  'text/csv': ['.csv'],
+  'text/plain': ['.txt'],
+};
+
+export default function Uploader({
+  onFilesAdded,
+  compact = false,
+  acceptedExtensions = null,
+  acceptedTypes = null,
+  acceptedLabel = 'PDF • JPG • PNG • DOCX',
+}) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusText, setStatusText] = useState('');
   const [errorNotice, setErrorNotice] = useState(null);
@@ -17,12 +34,26 @@ export default function Uploader({ onFilesAdded, compact = false }) {
       if (firstRejection.file.size > MAX_FILE_SIZE) {
         setErrorNotice('One or more files exceed the 200MB size limit.');
       } else {
-        setErrorNotice('Unsupported file format. Please upload PDF, images, or Office documents.');
+        setErrorNotice(`Unsupported file format. Please upload ${acceptedLabel} files.`);
       }
       return;
     }
 
     if (!acceptedFiles || acceptedFiles.length === 0) return;
+
+    // Validate file extensions if specific acceptedExtensions are provided
+    if (acceptedExtensions && acceptedExtensions.length > 0) {
+      const invalidFiles = acceptedFiles.filter((file) => {
+        const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
+        return !acceptedExtensions.includes(ext);
+      });
+      if (invalidFiles.length > 0) {
+        setErrorNotice(
+          `Invalid file format: "${invalidFiles[0].name}". Only ${acceptedLabel} files are supported by this tool.`
+        );
+        return;
+      }
+    }
 
     setIsProcessing(true);
     const validItems = [];
@@ -68,16 +99,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      'application/pdf': ['.pdf'],
-      'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
-      'text/html': ['.html', '.htm'],
-      'text/csv': ['.csv'],
-      'text/plain': ['.txt'],
-    },
+    accept: acceptedTypes || DEFAULT_ACCEPT,
     maxSize: MAX_FILE_SIZE,
     multiple: true,
   });
@@ -99,7 +121,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
           <Plus className="w-5 h-5 text-[#5B7147]" />
         )}
         <span className="text-sm font-semibold">
-          {isProcessing ? (statusText || 'Inspecting files...') : 'Add more files (PDF, images, documents)'}
+          {isProcessing ? (statusText || 'Inspecting files...') : `Add more files (${acceptedLabel})`}
         </span>
       </div>
     );
@@ -146,7 +168,7 @@ export default function Uploader({ onFilesAdded, compact = false }) {
 
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
             <span className="bg-[#FAF8F4] border border-[#DDD3C2] text-[#4E5941] px-3 py-1 rounded-full font-mono font-medium">
-              PDF • JPG • PNG • DOCX
+              {acceptedLabel}
             </span>
             <span className="text-[#BDC8B3]">•</span>
             <span className="text-[#6B785E]">Max 200MB per file</span>

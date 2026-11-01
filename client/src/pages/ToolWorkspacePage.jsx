@@ -12,6 +12,7 @@ import { getToolConfig } from '../constants/tools';
 import Uploader from '../components/common/Uploader';
 import FileCard from '../components/common/FileCard';
 import OperationBar from '../components/common/OperationBar';
+import { useParams } from 'react-router-dom';
 import Pagination from '../components/ui/Pagination';
 
 /**
@@ -33,7 +34,9 @@ export default function ToolWorkspacePage({
   setQueuePage,
   pageSize = 30,
 }) {
-  const currentConfig = getToolConfig(activeTab);
+  const { toolId } = useParams();
+  const effectiveToolId = activeTab || toolId || 'merge-pdf';
+  const currentConfig = getToolConfig(effectiveToolId);
   const ToolIcon = currentConfig.icon;
   const totalPages = Math.ceil(files.length / pageSize) || 1;
   const curPage = Math.min(queuePage, totalPages);
@@ -43,7 +46,7 @@ export default function ToolWorkspacePage({
 
   return (
     <motion.div
-      key={activeTab}
+      key={effectiveToolId}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
@@ -84,7 +87,12 @@ export default function ToolWorkspacePage({
           <div className="text-center mb-6">
             <p className="text-sm text-[#6B785E]">{currentConfig.hint}</p>
           </div>
-          <Uploader onFilesAdded={onFilesAdded} />
+          <Uploader
+            onFilesAdded={onFilesAdded}
+            acceptedExtensions={currentConfig.acceptedExtensions}
+            acceptedTypes={currentConfig.acceptedTypes}
+            acceptedLabel={currentConfig.acceptedLabel}
+          />
         </div>
       ) : (
         <div className="space-y-6">
@@ -185,7 +193,13 @@ export default function ToolWorkspacePage({
                 className="mt-2"
               />
 
-              <Uploader onFilesAdded={onFilesAdded} compact={true} />
+              <Uploader
+                onFilesAdded={onFilesAdded}
+                compact={true}
+                acceptedExtensions={currentConfig.acceptedExtensions}
+                acceptedTypes={currentConfig.acceptedTypes}
+                acceptedLabel={currentConfig.acceptedLabel}
+              />
             </div>
 
             <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-24">

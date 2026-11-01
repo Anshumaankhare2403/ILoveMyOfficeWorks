@@ -12,6 +12,7 @@ import {
   Zap,
   Check,
 } from 'lucide-react';
+import { TOTAL_TOOL_COUNT } from '../../constants/tools';
 
 export default function SplashScreen({ onComplete }) {
   const [progress, setProgress] = useState(0);
@@ -30,7 +31,7 @@ export default function SplashScreen({ onComplete }) {
       icon: FileText,
     },
     {
-      title: 'Registering 33 Office & Image Tools',
+      title: `Registering ${TOTAL_TOOL_COUNT} Office & Image Tools`,
       detail: 'Loading client adapters for PDF, DOCX, and high-res image manipulation',
       icon: Layers,
     },
@@ -293,7 +294,7 @@ export default function SplashScreen({ onComplete }) {
           className="mt-6 flex items-center justify-center gap-2 text-[11px] text-[#6B795D]"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-[#5B7147]" />
-          <span>Localhost Execution • Ghostscript Optimized • 33 Tools</span>
+          <span>Localhost Execution • Ghostscript Optimized • {TOTAL_TOOL_COUNT} Tools</span>
         </motion.div>
       </div>
     </motion.div>

@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { TOOL_CONFIGS } from '../constants/tools';
 
 /**
- * Custom hook to interface with Android Flutter mobile bridge and handle URL tool query/hash routing
+ * Custom hook to interface with Android Flutter mobile bridge and handle URL tool query routing
  */
 export function useMobileBridge({
   activeTab,
-  setActiveTab,
+  onNavigate,
   setShowSplash,
   onFilesReceived,
 }) {
@@ -22,12 +22,10 @@ export function useMobileBridge({
         setShowSplash(false);
       }
 
-      const urlTool =
-        searchParams.get('tool') ||
-        window.location.hash.replace('#', '').replace('tool=', '');
-
-      if (urlTool && TOOL_CONFIGS[urlTool]) {
-        setActiveTab(urlTool);
+      // Check URL query parameters for deep linked tools
+      const queryTool = searchParams.get('tool');
+      if (queryTool && TOOL_CONFIGS[queryTool] && onNavigate) {
+        onNavigate(`/tools/${queryTool}`);
         if (setShowSplash) {
           setShowSplash(false);
         }
@@ -36,9 +34,15 @@ export function useMobileBridge({
       // ignore
     }
 
-    // Expose tab control globally for native webview bridges
+    // Expose global navigation helpers for native WebViews (Electron & Flutter)
     window.setAppTab = (tab) => {
-      setActiveTab(tab);
+      if (onNavigate) {
+        if (!tab || tab === 'home') {
+          onNavigate('/');
+        } else {
+          onNavigate(`/tools/${tab}`);
+        }
+      }
     };
     window.getAppTab = () => activeTab;
 
@@ -56,5 +60,5 @@ export function useMobileBridge({
       delete window.setAppTab;
       delete window.getAppTab;
     };
-  }, [activeTab, setActiveTab, setShowSplash, onFilesReceived]);
+  }, [activeTab, onNavigate, setShowSplash, onFilesReceived]);
 }

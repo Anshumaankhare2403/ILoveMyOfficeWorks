@@ -47,7 +47,7 @@ export default function MainLayout({
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer onShowSplash={onShowSplash} />
     </div>
   );
 }

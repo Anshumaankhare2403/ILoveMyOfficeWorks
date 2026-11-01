@@ -38,11 +38,14 @@ import {
   Maximize2,
   Images,
 } from 'lucide-react';
+import { TOTAL_TOOL_COUNT } from '../constants/tools';
+import PrivacyDiagnosticsModal from '../components/common/PrivacyDiagnosticsModal';
 
 export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShowSplash }) {
   const [openDropdown, setOpenDropdown] = useState(null); // 'organize' | 'optimize' | 'convert' | 'edit' | 'security' | 'image' | 'allTools' | null
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSectionOpen, setMobileSectionOpen] = useState('organize');
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const closeTimerRef = useRef(null);
   const navContainerRef = useRef(null);
 
@@ -487,7 +490,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                 ILoveMy<span className="text-[#5B7147]">OfficeWorks</span>
               </span>
               <span className="hidden xl:inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#5B7147]/10 text-[#435433] border border-[#5B7147]/20 whitespace-nowrap">
-                33 Tools
+                {TOTAL_TOOL_COUNT} Tools
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-[#6B795D] font-medium hidden sm:block whitespace-nowrap">
@@ -1092,7 +1095,7 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-[#5B7147]" />
                       <span className="text-sm font-black text-[#1E2619] tracking-tight uppercase">
-                        All Office & Image Tools Directory (33 Tools)
+                        All Office & Image Tools Directory ({TOTAL_TOOL_COUNT} Tools)
                       </span>
                     </div>
                     <span className="text-xs text-[#6B795D] font-medium">
@@ -1147,8 +1150,8 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={onShowSplash}
-            title="View Brand Splash Screen & Privacy Diagnostics"
+            onClick={() => setShowDiagnostics(true)}
+            title="View Client-Side Privacy Diagnostics & Verification"
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#5B7147]/10 hover:bg-[#5B7147]/20 border border-[#5B7147]/20 text-[#3D4D2C] transition-all cursor-pointer group"
           >
             <span className="w-2 h-2 rounded-full bg-[#5B7147] animate-pulse" />
@@ -1254,23 +1257,29 @@ export default function Navbar({ activeTab, onTabChange, fileCounts = {}, onShow
               })}
             </div>
 
-            {/* Mobile View Splash Screen Action */}
-            <div className="pt-2 border-t border-[#F0EAE1]">
+            {/* Mobile View Splash Screen & Privacy Diagnostics Actions */}
+            <div className="pt-2 border-t border-[#F0EAE1] flex flex-col gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  onShowSplash?.();
+                  setShowDiagnostics(true);
                 }}
                 className="w-full py-2.5 px-3 rounded-xl bg-[#5B7147]/10 hover:bg-[#5B7147]/15 text-[#435433] text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#5B7147]" />
-                <span>Replay Brand Welcome & Diagnostics</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-[#5B7147]" />
+                <span>Privacy & System Diagnostics</span>
               </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Real-time Client-Side Privacy Diagnostics Modal */}
+      <PrivacyDiagnosticsModal
+        isOpen={showDiagnostics}
+        onClose={() => setShowDiagnostics(false)}
+      />
     </header>
   );
 }

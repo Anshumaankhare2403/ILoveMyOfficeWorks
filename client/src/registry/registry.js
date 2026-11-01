@@ -102,6 +102,7 @@ export const ADAPTER_REGISTRY = [
   cropImageAdapter,
   convertToJpgAdapter,
 ];
+export const TOTAL_TOOL_COUNT = ADAPTER_REGISTRY.length;
 
 /**
  * Returns all registered adapters with their validation status evaluated
