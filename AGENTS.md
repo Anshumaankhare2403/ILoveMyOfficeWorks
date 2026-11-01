@@ -36,15 +36,16 @@ ILoveMyOfficeWorks/
 │       └── 04-ui-and-design-system.md
 ├── client/                            # React + Vite Frontend (Primary application)
 │   ├── src/
-│   │   ├── components/                # UI components (Navbar, HomeScreen, DesktopTitleBar, etc.)
-│   │   ├── registry/                  # Pluggable Tool Adapter Registry
-│   │   │   ├── registry.js            # Central adapter loader & dispatcher
-│   │   │   └── adapters/              # Individual tool adapters (merge, split, compress, docx)
+│   │   ├── constants/                 # Theme tokens, tool configs & categories
+│   │   ├── hooks/                     # Custom hooks (useDocumentQueue, useDesktopBridge, useMobileBridge)
+│   │   ├── components/                # Component architecture
+│   │   │   ├── ui/                    # Design system primitives (Button, Badge, Card, Pagination, ErrorBoundary)
+│   │   │   └── common/                # Shared components (Uploader, FileCard, OperationBar, ThreeCanvas, SplashScreen)
+│   │   ├── layouts/                   # Layout wrappers (MainLayout, Navbar, DesktopTitleBar, Footer)
+│   │   ├── pages/                     # High-level views (HomePage, ToolWorkspacePage)
+│   │   ├── registry/                  # Pluggable Tool Adapter Registry (35 adapters)
 │   │   ├── utils/                     # Core PDF & document processing engines
-│   │   │   ├── pdf-compressor-engine.js  # Canvas downsampling + Object stream compression
-│   │   │   ├── pdf-to-docx-engine.js    # PDF.js + docx OpenXML text & layout converter
-│   │   │   └── pdf-magic.js             # Encryption check & metadata inspection
-│   │   ├── App.jsx                    # Root app state & tool routing
+│   │   ├── App.jsx                    # Root app state & orchestrator
 │   │   └── index.css                  # Tailored tokens, typography, glassmorphism
 │   └── package.json
 ├── desktop/                           # Windows Desktop Application (Electron.js)
